@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import BirthForm from "@/components/BirthForm";
 import ClearDataButton from "@/components/ClearDataButton";
 import DomainReading from "@/components/DomainReading";
+import FollowUpAsk from "@/components/FollowUpAsk";
 import type { BirthInput, TemplateReading } from "@/lib/shared/types";
 import type { BaziChart } from "@/lib/bazi/engine";
 import { saveModuleReading } from "@/lib/shared/compare-store";
+import { saveBaziChartSession } from "@/lib/shared/session-chart";
 
 export default function BaziPage() {
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,7 @@ export default function BaziPage() {
       setChart(data.chart);
       setReading(data.reading);
       if (data.reading) saveModuleReading("bazi", data.reading);
+      if (data.chart) saveBaziChartSession(data.chart);
     } catch (e) {
       setError(e instanceof Error ? e.message : "錯誤");
     } finally {
@@ -41,9 +45,9 @@ export default function BaziPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-[var(--ac)]">八字</h1>
+          <h1 className="text-2xl font-semibold text-[var(--ac)]">八字 · 一生解讀</h1>
           <p className="text-sm text-[var(--tx-2)] mt-1">
-            陽曆→四柱（lunar-javascript）· 可選真太陽時 · 十年大運 · 領域模板＋流年
+            顧問級默認輸出：十神／格局／用神意識 → 性格到健康各域 → 十年大運 → 流年＋逐月 → 口語綜合；下方可跟進詢問。
           </p>
         </div>
         <ClearDataButton
@@ -56,10 +60,12 @@ export default function BaziPage() {
           }}
         />
       </div>
-      <BirthForm onSubmit={(i) => run(i)} loading={loading} showName submitLabel="排八字並解讀" />
+
+      <BirthForm onSubmit={(i) => run(i)} loading={loading} showName submitLabel="排盤並產出一生解讀" />
+
       <div className="card p-4 flex flex-wrap gap-3 items-end">
         <div>
-          <label className="label">流年年份</label>
+          <label className="label">流年年份（併入主解讀）</label>
           <input className="input w-32" value={liunianYear} onChange={(e) => setLiunianYear(e.target.value)} />
         </div>
         <button
@@ -68,10 +74,15 @@ export default function BaziPage() {
           disabled={!lastInput || loading}
           onClick={() => lastInput && run(lastInput, parseInt(liunianYear, 10))}
         >
-          更新流年解讀
+          更新流年段
         </button>
+        <Link href="/compare" className="btn-ghost ml-auto">
+          去系統比對／大事核對 →
+        </Link>
       </div>
+
       {error && <p className="text-red-600 text-sm">{error}</p>}
+
       {chart && (
         <div className="card p-5 space-y-3">
           <h2 className="section-title">四柱</h2>
@@ -100,13 +111,14 @@ export default function BaziPage() {
           </div>
         </div>
       )}
+
       {chart?.dayun && (
         <div className="card p-5 space-y-4">
           <div>
             <h2 className="section-title">十年大運</h2>
             <p className="text-sm text-[var(--tx-2)] mt-1">{chart.dayun.qiYunNote}</p>
             <p className="text-xs text-[var(--tx-3)] mt-1">
-              每步約十年；大事核對會按事件年份對上覆蓋該年嘅大運。文化參考，唔作必準保證。
+              每步約十年；大事核對按事件年份對上覆蓋該年嘅大運。想深挖某步，用下面「跟進詢問」。
             </p>
           </div>
           <div className="space-y-3">
@@ -148,7 +160,10 @@ export default function BaziPage() {
           </div>
         </div>
       )}
+
       {reading && <DomainReading reading={reading} />}
+
+      <FollowUpAsk module="bazi" chart={chart} />
     </div>
   );
 }

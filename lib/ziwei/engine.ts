@@ -5,11 +5,19 @@ import { astro } from "iztro";
 import type { BirthInput, TemplateReading, DomainSection } from "@/lib/shared/types";
 import { calculateTrueSolar, BRANCH_NAMES } from "@/lib/shared/true-solar";
 
+export interface ZiweiSihuaHit {
+  star: string;
+  hua: "祿" | "權" | "科" | "忌";
+  palace: string;
+}
+
 export interface ZiweiPalaceView {
   name: string;
   earthlyBranch: string;
   majorStars: string[];
   minorStars: string[];
+  /** 本宮主／輔星自帶之四化 */
+  sihua?: ZiweiSihuaHit[];
   isMing?: boolean;
   isShen?: boolean;
 }
@@ -20,6 +28,9 @@ export interface ZiweiChartView {
   soul: string;
   body: string;
   palaces: ZiweiPalaceView[];
+  /** 全盤四化一覽 */
+  sihua: ZiweiSihuaHit[];
+  sihuaSummary: string;
   timeIndex: number;
   trueSolarNote?: string;
   schoolNote: string;
@@ -49,22 +60,45 @@ export function computeZiwei(input: BirthInput): ZiweiChartView {
   const gender = input.gender === "male" ? "男" : "女";
   // iztro bySolar
   const chart = astro.bySolar(dateStr, timeIndex, gender, true, "zh-TW");
+  type StarLike = { name: string; mutagen?: string };
+  const sihuaAll: ZiweiSihuaHit[] = [];
   const palaces: ZiweiPalaceView[] = (chart.palaces || []).map((p: {
     name: string;
     earthlyBranch: string;
-    majorStars?: { name: string }[];
-    minorStars?: { name: string }[];
-    adjectiveStars?: { name: string }[];
+    majorStars?: StarLike[];
+    minorStars?: StarLike[];
+    adjectiveStars?: StarLike[];
     isOriginalPalace?: boolean;
     isBodyPalace?: boolean;
-  }) => ({
-    name: p.name,
-    earthlyBranch: p.earthlyBranch,
-    majorStars: (p.majorStars || []).map((s) => s.name),
-    minorStars: [...(p.minorStars || []), ...(p.adjectiveStars || [])].map((s) => s.name).slice(0, 8),
-    isMing: p.isOriginalPalace || p.name === "命宮",
-    isShen: p.isBodyPalace || p.name === "身宮",
-  }));
+  }) => {
+    const starPool: StarLike[] = [
+      ...(p.majorStars || []),
+      ...(p.minorStars || []),
+      ...(p.adjectiveStars || []),
+    ];
+    const sihua: ZiweiSihuaHit[] = [];
+    for (const s of starPool) {
+      const h = (s.mutagen || "").trim();
+      if (h === "祿" || h === "權" || h === "科" || h === "忌") {
+        const hit: ZiweiSihuaHit = { star: s.name, hua: h, palace: p.name };
+        sihua.push(hit);
+        sihuaAll.push(hit);
+      }
+    }
+    return {
+      name: p.name,
+      earthlyBranch: p.earthlyBranch,
+      majorStars: (p.majorStars || []).map((s) => s.name),
+      minorStars: [...(p.minorStars || []), ...(p.adjectiveStars || [])].map((s) => s.name).slice(0, 8),
+      sihua,
+      isMing: p.isOriginalPalace || p.name === "命宮",
+      isShen: p.isBodyPalace || p.name === "身宮",
+    };
+  });
+
+  const sihuaSummary = sihuaAll.length
+    ? "本盤四化：" + sihuaAll.map((s) => `${s.palace}${s.star}化${s.hua}`).join("；") + "。讀法提要：化祿看機會資源、化權看主事話語權、化科看名氣文書貴人、化忌看耗神是非——忌要醒神收口，唔等於判災。"
+    : "本盤未讀到四化標記（引擎／參數差異）；宮星解讀仍可作人生域核對。";
 
   return {
     gender,
@@ -72,9 +106,11 @@ export function computeZiwei(input: BirthInput): ZiweiChartView {
     soul: chart.soul || "",
     body: chart.body || "",
     palaces,
+    sihua: sihuaAll,
+    sihuaSummary,
     timeIndex,
     trueSolarNote,
-    schoolNote: "排盘引擎：iztro（中州派常見參數）。解讀為本應用自研規則模板，並非倪海廈體系授權或原解讀數據集。",
+    schoolNote: "排盘引擎：iztro（中州派常見參數）。解讀為本應用自研規則模板，並非倪海廈體系授權或原解讀數據集。含宮星＋四化人生域。",
   };
 }
 
@@ -143,16 +179,24 @@ export function ziweiTemplateReading(chart: ZiweiChartView): TemplateReading {
     const stars = p?.majorStars || [];
     const branch = p?.earthlyBranch || "—";
     const minor = p?.minorStars?.length ? `輔星見 ${p.minorStars.slice(0, 5).join("、")}，可作細節提示，唔使迷信。` : "";
+    const sihua = (p?.sihua || []).length
+      ? `四化：${(p!.sihua || []).map((s) => `${s.star}化${s.hua}`).join("、")}。`
+      : "";
     return {
       key: palace,
       title,
-      text: `${palace}（${branch}）：${palaceAdvice(palace, stars)}${minor}`,
+      text: `${palace}（${branch}）：${palaceAdvice(palace, stars)}${sihua}${minor}`,
     };
+  });
+  sections.unshift({
+    key: "四化人生域",
+    title: "四化 × 人生域",
+    text: chart.sihuaSummary || "四化資料未齊。",
   });
   sections.unshift({
     key: "總論",
     title: "盤面總論",
-    text: `五行局：${chart.fiveElementsClass || "—"}；命主 ${chart.soul}、身主 ${chart.body}。若用生活語言：呢張盤講緊你點樣要舒適又要話事、點樣用腦力多過蠻力行人生。${chart.schoolNote}`,
+    text: `五行局：${chart.fiveElementsClass || "—"}；命主 ${chart.soul}、身主 ${chart.body}。若用生活語言：呢張盤講緊你點樣要舒適又要話事、點樣用腦力多過蠻力行人生。宮星看性情同領域，四化看「動力點／耗神點」——兩者合參先似顧問傾偈，唔係淨報星名。${chart.schoolNote}`,
   });
   const ming = byName["命宮"] || byName["命"];
   const mingStars = (ming?.majorStars || []).join("、") || "借對宮";

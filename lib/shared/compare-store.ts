@@ -25,7 +25,7 @@ const STORAGE_KEY = "mingli-verify-compare-v1";
 
 /** Domains used in the side-by-side matrix (HK Cantonese labels). */
 export const COMPARE_DOMAINS: { id: string; title: string; aliases: string[] }[] = [
-  { id: "personality", title: "性格", aliases: ["性格", "性格／命主", "命宮", "類型", "類型／策略", "人格", "盤面總論", "總論", "流年性格", "流年・性格／狀態", "口語綜合", "十年大運", "大運性格", "大運・"] },
+  { id: "personality", title: "性格", aliases: ["性格", "性格／命主", "命宮", "類型", "類型／策略", "人格", "盤面總論", "總論", "十神", "格局", "用神", "流年性格", "流年・性格／狀態", "口語綜合", "十年大運", "大運性格", "大運・", "四化"] },
   { id: "career", title: "事業", aliases: ["事業", "官祿", "事業擴張", "事業取向", "事業取向（模板）", "行動", "流年事業", "流年・事業", "大運事業"] },
   { id: "wealth", title: "財運", aliases: ["財帛", "財帛資源", "財運", "流年財運", "流年・財運", "大運財運"] },
   { id: "love", title: "感情", aliases: ["夫妻", "感情", "感情價值", "關係", "關係（模板）", "伴侶關係", "流年夫妻", "流年・婚姻／配偶", "大運感情"] },

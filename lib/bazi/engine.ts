@@ -552,13 +552,102 @@ function spouseText(p: ChartProfile, chart: BaziChart): string {
   return `姻緣平穩，重日常溫柔多過儀式感。有矛盾當日清，唔好積到爆。日支${chart.day.branch}係相處底色，期望要講出口。`;
 }
 
+
+/** 十神／格局／用神：顧問式框架段（放喺人生域之前） */
+function shishenOverview(chart: BaziChart, p: ChartProfile): DomainSection {
+  const lines = [
+    `日主${p.dm}（${p.el}）。十神係「日主同其他干支嘅關係標籤」——幫你睇力量從邊度嚟，唔係貼個性貼紙。`,
+    `四柱對照：年干「${p.yearStemRel}」、月干「${p.monthStemRel}」、日支主氣「${p.dayBranchRel}」、時干「${p.hourStemRel}」。`,
+    `盤面掃描：${[
+      p.hasOfficer ? "官殺（責任／壓力／名份）有根" : "",
+      p.hasPrint ? "印（學習／托住／安全感）有根" : "",
+      p.hasWealth ? "財（資源／機會）有根" : "",
+      p.hasFood ? "食神（表達／分享）有根" : "",
+      p.hasShang ? "傷官（批判／改寫）有根" : "",
+      p.hasBiJie ? "比劫（自立／同儕）有根" : "",
+    ].filter(Boolean).join("；") || "十神分布偏中性，成敗多在執行。"}`,
+    `實用讀法：月令（月柱）拉日常節奏；日支係親密同屋企底色；時柱睇付出同「交出去嘅生命」。以上係子平常用視角，文化參考。`,
+  ];
+  return { key: "十神總覽", title: "十神總覽", text: lines.join("\n\n") };
+}
+
+function gejuTendency(chart: BaziChart, p: ChartProfile): DomainSection {
+  let name = "普通／雜氣帶用";
+  let body = "";
+  if (p.hasShang && p.hasOfficer) {
+    name = "傷官配印／傷官見官傾向（視印星托住與否）";
+    body = "你有「睇穿就想改」同「要交代／有壓力」兩股力。成格關鍵唔係壓抑傷官，而係有冇印星或專業框架把鋒芒收成可交付成果；處理得好似顧問、改系統、教學；處理得差就口舌同內耗。";
+  } else if (p.hasShang) {
+    name = "傷官格傾向";
+    body = "以表達、創新、改寫規則為長；要防得罪人同自我苛責。宜走專業輸出，少靠情緒反彈換位。";
+  } else if (p.hasFood && !p.hasShang) {
+    name = "食神格傾向";
+    body = "分享、作品、服務輸出較順；記得收費同休息有程序，唔好淨付出。";
+  } else if (p.hasKill && !p.hasOfficer) {
+    name = "七殺／偏官傾向";
+    body = "競爭同期限令你醒神；宜有可交付目標，忌無意義人際鬥爭。有制（印或食傷泄）先穩。";
+  } else if (p.hasOfficer) {
+    name = "正官格傾向";
+    body = "重名份、規矩、交付；升遷靠口碑。忌把「應該」變成自我捆綁。";
+  } else if (p.hasWealth && p.outputHeavy) {
+    name = "食傷生財傾向";
+    body = "以輸出換資源；有專業護城，偏財機會先留得住。大額留冷靜期。";
+  } else if (p.hasWealth) {
+    name = "財格傾向";
+    body = "務實收成、對賬清晰；防被人分薄，合作寫明分成。";
+  } else if (p.hasPrint) {
+    name = "印重／學養托身傾向";
+    body = "學習、證照、導師係你嘅水；穩守專業多過亂跳。印太多亦防懶散——要有輸出出口。";
+  } else {
+    body = "未見單一明顯成格標籤時，唔好硬套古賦；以日主強弱同十神組合逐條核對人生更穩。";
+  }
+  const text = `格局傾向（規則引擎粗判，唔等於古法「成格」定論）：【${name}】\n\n${body}\n\n月令${chart.month.branch}、日支${chart.day.branch}一齊參——格局係「做事風格地圖」，要用流年大運同真實履歷核對。`;
+  return { key: "格局傾向", title: "格局傾向", text };
+}
+
+function yongshenFramework(chart: BaziChart, p: ChartProfile): DomainSection {
+  const lines: string[] = [
+    "用神框架意識（子平常見三條線，請分清唔好混用唔自知）：",
+    "① 格局用神：成格／破格看月令同關鍵十神（上面格局段）。",
+    "② 調候用神：寒暖燥濕——冬天生要火暖、夏天生要水潤（本引擎只提示意識，未做完整調候表）。",
+    "③ 旺衰扶抑：身強宜泄耗剋、身弱宜生扶。粗看日主五行同月令生剋只係第一步。",
+  ];
+  // 粗略扶抑提示
+  const monthEl = BRANCH_ELEMENT[chart.month.branch] || "土";
+  const dm = p.el;
+  let support = "平";
+  if (monthEl === dm || GENERATE[monthEl] === dm) support = "月令偏生扶日主";
+  else if (CONTROL[monthEl] === dm) support = "月令偏克日主";
+  else if (GENERATE[dm] === monthEl || CONTROL[dm] === monthEl) support = "月令偏泄／耗日主";
+  lines.push(`就你盤：日主${dm}，月令${chart.month.branch}（${monthEl}）→ ${support}。`);
+  if (p.outputHeavy && p.pressureHeavy) {
+    lines.push("實用取向：你已有輸出同壓力兩端——「用神」喺生活上往往係：有框架嘅輸出（收費、交付日）＋印星式充電（睡眠、學習、求助），而唔係再疊更多情緒刺激。");
+  } else if (p.outputHeavy) {
+    lines.push("實用取向：食傷已顯——順勢輸出，同時補休息同收費程序，避免過泄。");
+  } else if (p.hasPrint) {
+    lines.push("實用取向：印星有力——進修同求助係水；記得要有作品出口，唔好淨吸收。");
+  } else if (p.pressureHeavy) {
+    lines.push("實用取向：官殺壓力近——把期限變成清單；有食傷泄秀或印星化殺會更穩。");
+  } else {
+    lines.push("實用取向：先把一事做到可交付，再談喜用神標籤；人生核對大過術語。");
+  }
+  lines.push("聲明：以上係框架意識教學＋粗判，方便顧問核對敘事結構；完整調候／真假從格需人工細斷。文化參考。");
+  return { key: "用神框架", title: "用神框架意識", text: lines.join("\n\n") };
+}
+
+
 export function baziTemplateReading(chart: BaziChart, liunianYear?: number): TemplateReading {
   const p = profileOf(chart);
-  const sections: DomainSection[] = DOMAIN_KEYS.map(([key, title]) => ({
-    key,
-    title,
-    text: natalText(key, chart, p),
-  }));
+  const sections: DomainSection[] = [
+    shishenOverview(chart, p),
+    gejuTendency(chart, p),
+    yongshenFramework(chart, p),
+    ...DOMAIN_KEYS.map(([key, title]) => ({
+      key,
+      title,
+      text: natalText(key, chart, p),
+    })),
+  ];
   sections.push(...dayunSections(chart));
   if (liunianYear) sections.push(...liunianSections(chart, p, liunianYear));
   sections.push(oralSynthesis(chart, p, liunianYear));

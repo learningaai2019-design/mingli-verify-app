@@ -12,6 +12,14 @@ import {
   type StoredModuleResult,
 } from "@/lib/shared/compare-store";
 import LifeEventsPanel from "@/components/LifeEventsPanel";
+import FollowUpAsk from "@/components/FollowUpAsk";
+import {
+  loadBaziChartSession,
+  loadZiweiChartSession,
+  clearAllChartSessions,
+} from "@/lib/shared/session-chart";
+import type { BaziChart } from "@/lib/bazi/engine";
+import type { ZiweiChartView } from "@/lib/ziwei/engine";
 
 type ViewMode = "matrix" | "cards";
 
@@ -20,6 +28,9 @@ export default function ComparePage() {
   const [selected, setSelected] = useState<ModuleId[]>([]);
   const [mode, setMode] = useState<ViewMode>("matrix");
   const [tick, setTick] = useState(0);
+  const [baziChart, setBaziChart] = useState<BaziChart | null>(null);
+  const [ziweiChart, setZiweiChart] = useState<ZiweiChartView | null>(null);
+  const [followModule, setFollowModule] = useState<"bazi" | "ziwei">("bazi");
 
   const refresh = useCallback(() => {
     const list = loadAllResults().sort((a, b) => a.savedAt - b.savedAt);
@@ -30,6 +41,8 @@ export default function ComparePage() {
       const kept = prev.filter((id) => ids.includes(id));
       return kept.length ? kept : ids;
     });
+    setBaziChart(loadBaziChartSession());
+    setZiweiChart(loadZiweiChartSession());
   }, []);
 
   useEffect(() => {
@@ -83,8 +96,11 @@ export default function ComparePage() {
             className="btn-ghost"
             onClick={() => {
               clearAllResults();
+              clearAllChartSessions();
               setResults([]);
               setSelected([]);
+              setBaziChart(null);
+              setZiweiChart(null);
             }}
           >
             清除全部比對暫存
@@ -232,6 +248,40 @@ export default function ComparePage() {
           )}
         </>
       )}
+
+      <section className="card p-5 space-y-3 border-[var(--ac-bdr)]">
+        <h2 className="section-title mb-0">跟進詢問（重用已排盤面）</h2>
+        <p className="text-sm text-[var(--tx-2)]">
+          同一個整合入口：若你已喺八字／紫微頁跑過分析，可喺呢度繼續問某步大運、某年或人生域——唔另開雜項功能。
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(["bazi", "ziwei"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              className="px-3 py-1.5 rounded-full text-sm border"
+              style={{
+                borderColor: followModule === m ? "var(--ac-bdr)" : "var(--bdr)",
+                background: followModule === m ? "var(--ac-bg)" : "transparent",
+                color: followModule === m ? "var(--ac)" : "var(--tx-2)",
+              }}
+              onClick={() => setFollowModule(m)}
+            >
+              {m === "bazi" ? "八字盤" : "紫微盤"}
+              {m === "bazi" ? (baziChart ? " ✓" : "（未有）") : ziweiChart ? " ✓" : "（未有）"}
+            </button>
+          ))}
+        </div>
+        <FollowUpAsk
+          module={followModule}
+          chart={followModule === "bazi" ? baziChart : ziweiChart}
+          disabledReason={
+            followModule === "bazi"
+              ? "請先去八字頁跑一次一生解讀。"
+              : "請先去紫微頁跑一次宮星四化解讀。"
+          }
+        />
+      </section>
 
       <LifeEventsPanel moduleResults={active.length ? active : results} />
 

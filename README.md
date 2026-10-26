@@ -2,27 +2,35 @@
 
 Privacy-first Traditional Chinese (HK Cantonese-friendly) web app for **命理顧問 verification**.
 
-Let others input birth / name / 卦 data and run analyses across all modules to spot-check accuracy — **without storing personal data**.
+The product goal is to **embody chat-quality consultant readings** in the app — not a farm of piecemeal feature patches.
+
+## Product shape
+
+1. **Home** → run modules (八字 / 紫微 first-class)
+2. **Module pages** default to full consultant-depth prose
+3. **One integrated 「跟進詢問」** box (module pages + compare) reuses the already-computed chart/session — ask about a 大運 decade, a year, 感情/事業, a 宮位
+4. **系統比對 + 大事自動核對** on `/compare`
+5. Session-only privacy; clear buttons wipe compare cache + chart snapshots
 
 ## Privacy
 
 - **No DB**, no PII in `localStorage`, no birth-data cookies, no server disk logs of inputs.
-- State lives in React memory / request lifetime only. Refresh = gone.
-- Big **「清除本機資料」** button on every module page.
+- Chart snapshots for follow-up live in **sessionStorage** (no name / raw birth string); tab close = gone.
+- Big **「清除本機資料」** on every module page.
 - Details: in-app `/privacy`.
 
-## Modules
+## Modules (reading depth)
 
-| Module | Engine | Notes |
-|--------|--------|-------|
-| 八字 | `lunar-javascript` | 四柱、真太陽時、**十年大運**（起運／干支／歲年／短批）、十二領域＋流年各方面＋逐月加長批注＋口語綜合 |
-| 紫微 | `iztro` | 排盘＋宮位模板；披露流派；**非倪師授權／非專有數據集** |
-| 西洋 | Python `kerykeion` via `/workspace/.venv-astro` | Tropical Placidus |
-| 人類圖 | same venv + gate wheel | Type / Authority / Profile / Centers / Channels |
-| 六爻 | in-house | **一事一問**自由問題（必填）＋可選主題助手；铜钱／手動／時間；用神；五大纲领短判；拒占犯罪／不義財；愚人公開線 disclaimer |
-| 姓名 | 康熙筆畫表 | 五格三才；熊崎系華語主流 disclosure |
+| Module | Engine | Default output |
+|--------|--------|----------------|
+| **八字** | `lunar-javascript` | 十神總覽、格局傾向、用神框架意識 → 性格／學業／事業／財／田宅／父母／兄弟／朋輩／婚姻／子女／健康（早→晚）→ **十年大運** → 流年領域＋逐月 → 口語綜合；跟進詢問 |
+| **紫微** | `iztro` | 十二宮人生域＋**四化**提要＋口語綜合；跟進詢問宮／域；披露流派；**非倪師授權** |
+| 西洋 | Python `kerykeion` | Tropical Placidus＋行星宮位模板 |
+| 人類圖 | same venv | Type / Authority / Profile / Centers / Channels |
+| 六爻 | in-house | 一事一問＋用神＋五大纲领 |
+| 姓名 | 康熙筆畫 | 五格三才 |
 
-All readings are labeled **「規則／模板解讀・文化參考」**. Optional `OPENAI_API_KEY` / Anthropic env vars are never required and never write PII prompts to disk.
+All readings labeled **「規則／模板解讀・文化參考」**.
 
 ## Run
 
@@ -38,23 +46,16 @@ Western / Human Design need `/workspace/.venv-astro` (kerykeion). Override with 
 
 ## 大事核對（/compare）
 
-Enter 2010–2026 life events → App **auto-judges** 中／一半／唔中 by heuristic theme match against cached module readings (prefers **大運** covering that year, then 流年 when year aligns). Per-system reasons in Cantonese. Manual override is optional/secondary. sessionStorage only.
+Enter 2010–2026 life events → App **auto-judges** 中／一半／唔中 by heuristic theme match against cached module readings (prefers **大運** covering that year, then 流年). sessionStorage only.
 
 ## Disclaimer
 
-Cultural-reference tooling for consultant QA. Not medical, legal, or investment advice. MIT-licensed original app; visual patterns inspired by public demo aesthetics only.
+Cultural-reference tooling for consultant QA. Not medical, legal, or investment advice. MIT-licensed original app.
 
 ## Known gaps
 
-- 六爻：装卦為簡化版（未完整排出六親／六神／伏神／動爻細節表）。
-- 姓名：康熙筆畫表為常用字子集；缺字標 `fallback` 估算，需人工覆核辭典。複姓規則簡化。
-- 紫微：排盘用 `iztro`，解讀為自研模板，非倪海廈教材／專有數據。
-- 西洋／人類圖：依賴 box 上 `/workspace/.venv-astro`（kerykeion）。
-- 解讀全部為規則／模板；可選 LLM key 未強制接入主流程。
-
-## UI / 系統比對 (2026-10)
-
-- Warm light theme + subtle decorative SVG background (`public/bg-pattern.svg`).
-- `/compare`「系統比對」: after running 2+ modules, side-by-side matrix / cards across domains.
-- Compare cache: **sessionStorage** holds reading summaries only (no birth dates / names). Cleared on tab close or via clear buttons.
-- `/compare`「大事年表 · 事實核對」: enter 2010–2026 life events, mark 中／一半／唔中 (optional per-system + optional 參考建議). Client-only sessionStorage; clear button on the panel.
+- 六爻：装卦為簡化版。
+- 姓名：康熙筆畫常用字子集。
+- 紫微：iztro 排盘＋自研模板，非倪海廈教材。
+- 西洋／人類圖：依賴 box `/workspace/.venv-astro`。
+- 解讀為規則／模板；可選 LLM key 未強制接入主流程。
