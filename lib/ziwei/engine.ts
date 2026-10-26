@@ -130,9 +130,16 @@ export function ziweiTemplateReading(chart: ZiweiChartView): TemplateReading {
     title: "盤面總論",
     text: `五行局：${chart.fiveElementsClass || "—"}；命主 ${chart.soul}、身主 ${chart.body}。${chart.schoolNote}`,
   });
+  const ming = byName["命宮"] || byName["命"];
+  const mingStars = (ming?.majorStars || []).join("、") || "借對宮";
+  sections.push({
+    key: "口語綜合",
+    title: "口語綜合",
+    text: `講真，呢張紫微盤睇落，你係一個「命主 ${chart.soul}、身主 ${chart.body}」底色嘅人，五行局${chart.fiveElementsClass || "未明"}，命宮主星約係${mingStars}——唔係標籤，而係你日常做決定時會返覆出現嘅節奏。事業同財帛宮提醒你：有架構就守交付，有庫就節制；感情同父母線則靠坦白溝通多過靠猜。健康方面，疾厄宮只係提醒作息，有事睇醫生，呢度唔係診斷。最後一句：紫微係文化地圖，你肯做嘅小步驟——回覆訊息、規律睡眠、錢銀寫低——往往比任何「必準」斷語更改寫今年結局。`,
+  });
   return {
     label: "規則／模板解讀・文化參考",
-    disclaimer: "紫微解讀為模板引擎，披露流派為 iztro／中州派常見排盘參數；非任何特定名師授權教材。",
+    disclaimer: "紫微解讀為模板引擎，披露流派為 iztro／中州派常見排盘參數；非任何特定名師授權教材。文化參考，唔作必準保證。",
     sections,
   };
 }

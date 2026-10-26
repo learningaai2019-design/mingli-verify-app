@@ -48,9 +48,16 @@ export function westernTemplateReading(chart: WesternChart): TemplateReading {
     title: "盤面總論",
     text: `${chart.system}；上升${chart.ascendant.signZh} ${chart.ascendant.degree}°。以下為規則／模板解讀・文化參考。`,
   });
+  const sun = find(chart, "sun");
+  const moon = find(chart, "moon");
+  sections.push({
+    key: "口語綜合",
+    title: "口語綜合",
+    text: `講真，呢張西洋盤最易被見到嘅一面係上升${chart.ascendant.signZh}，內心節奏則多睇月亮${moon ? moon.signZh : "—"}，生命主題核心係太陽${sun ? sun.signZh : "—"}——三者一齊先組成「你呢個人」，唔係單一星座標籤。感情同事業唔使神話化：金星／火星話你點樣連結，木土話你點樣擴張同負責；實用做法係重大決定留冷靜期、錢銀同承諾分開傾。健康節奏跟火星同土星——出力要有恢復，長期唔舒服要請醫生。占星只係文化參考地圖，你今日肯做嘅小步驟，往往比任何「必準」斷語更改變年底成績。`,
+  });
   return {
     label: "規則／模板解讀・文化參考",
-    disclaimer: "西洋占星採用熱帶黃道＋Placidus；解讀為模板引擎，非專業一對一諮詢。",
+    disclaimer: "西洋占星採用熱帶黃道＋Placidus；解讀為模板引擎，非專業一對一諮詢。文化參考，唔作必準保證。",
     sections,
   };
 }

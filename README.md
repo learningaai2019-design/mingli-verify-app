@@ -15,7 +15,7 @@ Let others input birth / name / 卦 data and run analyses across all modules to 
 
 | Module | Engine | Notes |
 |--------|--------|-------|
-| 八字 | `lunar-javascript` | 四柱、真太陽時、十二領域＋流年貴小人／逐月 |
+| 八字 | `lunar-javascript` | 四柱、真太陽時、十二領域＋流年各方面＋逐月加長批注＋口語綜合 |
 | 紫微 | `iztro` | 排盘＋宮位模板；披露流派；**非倪師授權／非專有數據集** |
 | 西洋 | Python `kerykeion` via `/workspace/.venv-astro` | Tropical Placidus |
 | 人類圖 | same venv + gate wheel | Type / Authority / Profile / Centers / Channels |

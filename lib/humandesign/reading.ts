@@ -67,10 +67,15 @@ export function hdTemplateReading(chart: HDChart): TemplateReading {
       title: "關係（模板）",
       text: "關係中注意開放中心被制約；健康連結建基於權威與策略，而非討好。",
     },
+    {
+      key: "口語綜合",
+      title: "口語綜合",
+      text: `講真，你呢張人類圖最核心唔係術語，而係：你係${chart.TypeZh}，重大決定要跟「${chart.AuthorityZh}」，日常節奏跟策略「${chart.Strategy}」——聽落抽象，落地就係少逼自己、多等身體同環境嘅清晰訊號。開放中心易接收別人情緒，記得問一句「呢個係我定人哋嘅？」再回應。事業上按類型運作（等邀請／有共鳴先推／先告知），關係上唔好靠討好換安全感。人類圖係文化參考地圖，唔係判決；你今日肯做嘅小步驟——睡夠、拒絕一單唔啱嘅邀約——往往比任何「必準」標籤更改寫今年。`,
+    },
   ];
   return {
     label: "規則／模板解讀・文化參考",
-    disclaimer: "人類圖計算：kerykeion 熱帶星曆＋88°太陽弧 Design；閘門輪盤 Gate25@358.25°。非 Jovian 官方授權軟件。",
+    disclaimer: "人類圖計算：kerykeion 熱帶星曆＋88°太陽弧 Design；閘門輪盤 Gate25@358.25°。非 Jovian 官方授權軟件。文化參考，唔作必準保證。",
     sections,
   };
 }

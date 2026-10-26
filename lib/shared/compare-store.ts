@@ -25,15 +25,15 @@ const STORAGE_KEY = "mingli-verify-compare-v1";
 
 /** Domains used in the side-by-side matrix (HK Cantonese labels). */
 export const COMPARE_DOMAINS: { id: string; title: string; aliases: string[] }[] = [
-  { id: "personality", title: "性格", aliases: ["性格", "性格／命主", "命宮", "類型", "類型／策略", "人格", "盤面總論", "總論"] },
-  { id: "career", title: "事業", aliases: ["事業", "官祿", "事業擴張", "事業取向", "事業取向（模板）", "行動"] },
-  { id: "wealth", title: "財運", aliases: ["財帛", "財帛資源", "財運"] },
-  { id: "love", title: "感情", aliases: ["夫妻", "感情", "感情價值", "關係", "關係（模板）", "伴侶關係"] },
-  { id: "health", title: "健康", aliases: ["健康", "疾厄", "健康節奏"] },
-  { id: "study", title: "學業", aliases: ["學業", "思考", "思考表達"] },
-  { id: "family", title: "家人", aliases: ["父母", "子女", "兄弟", "兄弟朋輩", "朋輩", "交友"] },
-  { id: "home", title: "田宅", aliases: ["田宅", "外出／遷移", "遷移"] },
-  { id: "life", title: "人生節奏", aliases: ["早年到晚年", "精神福德", "福德", "情緒", "情緒／內在", "輪廓", "輪廓／定義", "內在權威", "權威"] },
+  { id: "personality", title: "性格", aliases: ["性格", "性格／命主", "命宮", "類型", "類型／策略", "人格", "盤面總論", "總論", "流年性格", "流年・性格／狀態", "口語綜合"] },
+  { id: "career", title: "事業", aliases: ["事業", "官祿", "事業擴張", "事業取向", "事業取向（模板）", "行動", "流年事業", "流年・事業"] },
+  { id: "wealth", title: "財運", aliases: ["財帛", "財帛資源", "財運", "流年財運", "流年・財運"] },
+  { id: "love", title: "感情", aliases: ["夫妻", "感情", "感情價值", "關係", "關係（模板）", "伴侶關係", "流年夫妻", "流年・婚姻／配偶"] },
+  { id: "health", title: "健康", aliases: ["健康", "疾厄", "健康節奏", "流年健康", "流年・健康"] },
+  { id: "study", title: "學業", aliases: ["學業", "思考", "思考表達", "流年學業", "流年・學業"] },
+  { id: "family", title: "家人", aliases: ["父母", "子女", "兄弟", "兄弟朋輩", "朋輩", "交友", "流年父母", "流年兄弟", "流年朋輩", "流年子女", "流年・父母", "流年・兄弟／手足", "流年・朋輩", "流年・子女"] },
+  { id: "home", title: "田宅", aliases: ["田宅", "外出／遷移", "遷移", "流年田宅", "流年・田宅／家居"] },
+  { id: "life", title: "人生節奏", aliases: ["早年到晚年", "精神福德", "福德", "情緒", "情緒／內在", "輪廓", "輪廓／定義", "內在權威", "權威", "流年總論", "口語綜合"] },
 ];
 
 function canUseStorage() {
@@ -71,7 +71,7 @@ export function saveModuleReading(moduleId: ModuleId, reading: TemplateReading) 
     sections: (reading.sections || []).map((s) => ({
       key: String(s.key || ""),
       title: String(s.title || ""),
-      text: String(s.text || "").slice(0, 4000),
+      text: String(s.text || "").slice(0, 6000),
     })),
     savedAt: Date.now(),
   };
