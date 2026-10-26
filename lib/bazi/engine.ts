@@ -648,7 +648,7 @@ export function baziTemplateReading(chart: BaziChart, liunianYear?: number): Tem
       text: natalText(key, chart, p),
     })),
   ];
-  sections.push(...dayunSections(chart));
+  sections.push(...dayunSections(chart, liunianYear));
   if (liunianYear) sections.push(...liunianSections(chart, p, liunianYear));
   sections.push(oralSynthesis(chart, p, liunianYear));
   return {
@@ -658,13 +658,14 @@ export function baziTemplateReading(chart: BaziChart, liunianYear?: number): Tem
   };
 }
 
-/** 十年大運：總表＋每步短批（含年份，供大事核對對位） */
-function dayunSections(chart: BaziChart): DomainSection[] {
+/** 十年大運（適中 prune）：總覽＋現運一步；完整 steps 仍在 chart.dayun JSON */
+function dayunSections(chart: BaziChart, focusYear?: number): DomainSection[] {
   const du = chart.dayun;
   const out: DomainSection[] = [];
+  const y = focusYear || new Date().getFullYear();
   const overviewLines = [
     `起運：${du.qiYunNote}`,
-    "以下為十年大運序列（干支・約起止歲／年・性格／事業／財／感情／健康短批）。大事核對請對「事件年份」落喺邊一步大運。",
+    "以下為十年大運序列一覽（干支・約起止歲／年）。各步性格／事業／財／感情／健康短批見頁頂「十年大運」卡；解讀正文只展開現運一步，避免同頁重複。大事核對請對事件年份落喺邊一步。",
   ];
   for (const s of du.steps) {
     if (!s.ganZhi || s.ganZhi === "（起運前）") {
@@ -680,42 +681,19 @@ function dayunSections(chart: BaziChart): DomainSection[] {
     title: "十年大運・總覽",
     text: overviewLines.join("\n"),
   });
-  for (const s of du.steps) {
-    const label = !s.ganZhi || s.ganZhi === "（起運前）" ? "起運前" : `${s.ganZhi}大運`;
+  const current = du.steps.find((s) => y >= s.startYear && y <= s.endYear);
+  if (current) {
+    const label =
+      !current.ganZhi || current.ganZhi === "（起運前）" ? "起運前" : `${current.ganZhi}大運`;
     out.push({
-      key: `大運${s.index}`,
-      title: `大運・${label}（${s.startYear}–${s.endYear}）`,
-      text: s.summary,
-    });
-    // Domain-tagged slices so compare／大事核對 theme matcher can hit 事業／財／感情／健康
-    out.push({
-      key: `大運${s.index}性格`,
-      title: `大運性格・${label}（${s.startYear}–${s.endYear}）`,
-      text: `${s.startYear}–${s.endYear}年（約${s.startAge}–${s.endAge}歲）${label}：${s.brief.personality}`,
-    });
-    out.push({
-      key: `大運${s.index}事業`,
-      title: `大運事業・${label}（${s.startYear}–${s.endYear}）`,
-      text: `${s.startYear}–${s.endYear}年 ${label}事業：${s.brief.career}`,
-    });
-    out.push({
-      key: `大運${s.index}財運`,
-      title: `大運財運・${label}（${s.startYear}–${s.endYear}）`,
-      text: `${s.startYear}–${s.endYear}年 ${label}財：${s.brief.wealth}`,
-    });
-    out.push({
-      key: `大運${s.index}感情`,
-      title: `大運感情・${label}（${s.startYear}–${s.endYear}）`,
-      text: `${s.startYear}–${s.endYear}年 ${label}感情：${s.brief.love}`,
-    });
-    out.push({
-      key: `大運${s.index}健康`,
-      title: `大運健康・${label}（${s.startYear}–${s.endYear}）`,
-      text: `${s.startYear}–${s.endYear}年 ${label}健康：${s.brief.health}`,
+      key: `大運${current.index}`,
+      title: `現運・${label}（${current.startYear}–${current.endYear}）`,
+      text: current.summary,
     });
   }
   return out;
 }
+
 
 function liunianYearVoice(rel: string, year: number, ygz: string, p: ChartProfile): string {
   const { mood, tip, noble, petty, verb } = tipForRel(rel);
@@ -925,6 +903,8 @@ function liunianSections(chart: BaziChart, p: ChartProfile, year: number): Domai
       key: d.key,
       title: d.title,
       text: liunianDomain(rel, d.key, year, branch, branchEl, p, chart),
+      defaultCollapsed: true,
+      group: "流年人生域",
     });
   }
 
@@ -939,6 +919,8 @@ function liunianSections(chart: BaziChart, p: ChartProfile, year: number): Domai
       key: `流月${idx + 1}`,
       title: `流年批注・${m.label}${m.branch}`,
       text: monthBody(m.label, m.branch, idx, p.el, rel, year),
+      defaultCollapsed: true,
+      group: "流年逐月",
     });
   });
   return out;
@@ -976,7 +958,7 @@ function oralSynthesis(chart: BaziChart, p: ChartProfile, liunianYear?: number):
     })[0];
     if (covering) {
       paras.push(
-        `大運方面：${covering.ganZhi === "（起運前）" ? "仍近起運前／童限" : `而家／近段行${covering.ganZhi}大運（${covering.startYear}–${covering.endYear}，十神${covering.stemShishen}）`}。十年大運係大事核對嘅主軸之一——流年係一年戲，大運係十年舞台。詳見上面「十年大運」各步短批。`,
+        `大運方面：${covering.ganZhi === "（起運前）" ? "仍近起運前／童限" : `而家／近段行${covering.ganZhi}大運（${covering.startYear}–${covering.endYear}，十神${covering.stemShishen}）`}。十年大運係大事核對嘅主軸之一——流年係一年戲，大運係十年舞台。詳見上面「大運總覽／現運」同頁頂大運卡。`,
       );
     }
   }

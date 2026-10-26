@@ -47,7 +47,7 @@ export default function BaziPage() {
         <div>
           <h1 className="text-2xl font-semibold text-[var(--ac)]">八字 · 一生解讀</h1>
           <p className="text-sm text-[var(--tx-2)] mt-1">
-            顧問級默認輸出：十神／格局／用神意識 → 性格到健康各域 → 十年大運 → 流年＋逐月 → 口語綜合；下方可跟進詢問。
+            顧問級默認輸出：十神／格局／用神 → 12 人生域 → 大運總覽／現運 → 流年總論 → 口語綜合；流年人生域同逐月預設摺起。頁頂大運卡已有各步短批，解讀唔再重複展開全部大運域。
           </p>
         </div>
         <ClearDataButton

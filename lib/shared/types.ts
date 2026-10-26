@@ -19,6 +19,10 @@ export interface DomainSection {
   key: string;
   title: string;
   text: string;
+  /** When true, DomainReading renders this section (or its group) collapsed by default. */
+  defaultCollapsed?: boolean;
+  /** Consecutive sections sharing a group render under one collapsible card. */
+  group?: string;
 }
 
 export interface TemplateReading {
