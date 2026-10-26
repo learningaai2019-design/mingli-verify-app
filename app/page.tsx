@@ -37,14 +37,19 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <section className="text-center space-y-3 pt-4">
-        <p className="badge mx-auto">顧問核對用 · Privacy-first</p>
+        <p className="badge mx-auto">顧問核對用 · Privacy-first · 暖色輕盈</p>
         <h1 className="text-3xl sm:text-4xl font-semibold text-[var(--tx-0)] tracking-wide">
           命理核對工作台
         </h1>
         <p className="text-[var(--tx-2)] max-w-2xl mx-auto text-sm sm:text-base">
           畀其他人自行輸入出生／姓名／卦象資料，一次跑齊各模組，方便核對準確度。
-          資料只留喺瀏覽器記憶體；重新整理即消失。解讀標示為「規則／模板解讀・文化參考」。
+          出生資料只留喺瀏覽器記憶體；解讀摘要可暫存作「系統比對」。解讀標示為「規則／模板解讀・文化參考」。
         </p>
+        <div className="pt-2">
+          <Link href="/compare" className="btn-primary inline-block">
+            去系統比對 →
+          </Link>
+        </div>
       </section>
       <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {MODULES.map((m) => (
@@ -57,6 +62,16 @@ export default function HomePage() {
             <p className="text-sm text-[var(--tx-2)]">{m.desc}</p>
           </Link>
         ))}
+        <Link
+          href="/compare"
+          className="card p-5 hover:border-[var(--ac-bdr)] transition-colors block border-[var(--ac-bdr)]"
+          style={{ background: "linear-gradient(145deg, rgba(255,248,240,0.95), rgba(255,228,200,0.9))" }}
+        >
+          <h2 className="text-lg font-semibold text-[var(--ac)] mb-2">系統比對</h2>
+          <p className="text-sm text-[var(--tx-2)]">
+            試完八字／紫微／西洋／人類圖／六爻／姓名後，並排對照性格、事業、財運、感情、健康等領域。
+          </p>
+        </Link>
       </section>
       <section className="card p-5 text-sm text-[var(--tx-2)] space-y-2">
         <h3 className="section-title">使用聲明</h3>

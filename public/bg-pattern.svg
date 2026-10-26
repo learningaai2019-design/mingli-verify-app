@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480" fill="none">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#f3c98b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f3c98b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- soft wash -->
+  <circle cx="120" cy="80" r="140" fill="url(#g)"/>
+  <circle cx="380" cy="360" r="160" fill="url(#g)"/>
+  <!-- subtle cloud curves -->
+  <path d="M40 120c20-18 48-18 68 0 14-22 44-28 66-10 18-14 44-10 56 8" stroke="#c9a06a" stroke-opacity="0.18" stroke-width="1.2" fill="none"/>
+  <path d="M280 70c18-14 40-12 56 4 12-16 36-20 54-6" stroke="#c9a06a" stroke-opacity="0.14" stroke-width="1.1" fill="none"/>
+  <path d="M60 380c22-16 50-14 70 4 16-18 44-22 64-4" stroke="#c9a06a" stroke-opacity="0.14" stroke-width="1.1" fill="none"/>
+  <!-- tiny stars / sparkles -->
+  <g fill="#c48a3a" fill-opacity="0.22">
+    <circle cx="90" cy="200" r="1.6"/>
+    <circle cx="200" cy="60" r="1.4"/>
+    <circle cx="340" cy="140" r="1.8"/>
+    <circle cx="420" cy="240" r="1.3"/>
+    <circle cx="160" cy="320" r="1.5"/>
+    <circle cx="300" cy="400" r="1.4"/>
+    <circle cx="50" cy="280" r="1.2"/>
+    <circle cx="250" cy="220" r="1.3"/>
+  </g>
+  <!-- soft bagua-inspired ring (decorative, not literal) -->
+  <circle cx="400" cy="90" r="28" stroke="#d4a574" stroke-opacity="0.16" stroke-width="1" fill="none"/>
+  <circle cx="400" cy="90" r="18" stroke="#d4a574" stroke-opacity="0.12" stroke-width="0.8" fill="none"/>
+  <path d="M400 62v16M400 102v16M372 90h16M412 90h16" stroke="#d4a574" stroke-opacity="0.14" stroke-width="0.9"/>
+  <circle cx="70" cy="420" r="22" stroke="#d4a574" stroke-opacity="0.12" stroke-width="1" fill="none"/>
+  <!-- lotus-ish petal hint -->
+  <path d="M230 440c8-18 22-28 40-28s32 10 40 28c-10-6-24-8-40-8s-30 2-40 8z" fill="#e8b87a" fill-opacity="0.08"/>
+</svg>

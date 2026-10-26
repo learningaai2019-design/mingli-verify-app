@@ -12,8 +12,11 @@ export default function PrivacyPage() {
           <li>唔會將出生／姓名等 PII 寫入 localStorage（{String(flags.localStoragePII)}）</li>
           <li>唔會用 Cookie 保存出生資料（{String(flags.cookiesBirth)}）</li>
           <li>伺服器 API 路由唔會將輸入內容寫入磁碟日誌（設計目標：{String(!flags.serverInputLogs)}）</li>
-          <li>狀態僅存在 React 元件記憶體；重新整理／關閉分頁即清除</li>
-          <li>各模組頁面有大顆「{PRIVACY_COPY.clear}」按鈕，可即時清掉本頁結果</li>
+          <li>
+            「系統比對」可選將<strong>解讀摘要</strong>（唔含出生日期／姓名）暫存喺瀏覽器 sessionStorage；
+            關閉分頁即清除（sessionStorageReadingsOnly = {String(flags.sessionStorageReadingsOnly)}）
+          </li>
+          <li>各模組頁面有「{PRIVACY_COPY.clear}」按鈕，可即時清掉本頁結果同對應比對暫存</li>
         </ul>
         <p className="text-[var(--tx-3)]">
           可選 LLM API key 若存在，亦唔會將含 PII 嘅 prompt 寫入磁碟。請勿喺共用電腦留下未清除嘅畫面截圖。

@@ -1,8 +1,7 @@
 import type { ZiweiChartView } from "@/lib/ziwei/engine";
 
-/** Compact 4x4-ish palace board aesthetic (dark elegant). */
+/** Compact palace board — warm light aesthetic. */
 export default function ZiweiBoard({ chart }: { chart: ZiweiChartView }) {
-  // Display palaces in a simple responsive grid
   return (
     <div className="card p-4">
       <div className="flex flex-wrap gap-2 text-xs text-[var(--tx-3)] mb-3">
@@ -17,7 +16,7 @@ export default function ZiweiBoard({ chart }: { chart: ZiweiChartView }) {
             key={p.name + p.earthlyBranch}
             className="rounded-lg border border-[var(--bdr)] p-2 min-h-[96px]"
             style={{
-              background: p.isMing ? "rgba(212,168,67,0.08)" : "rgba(255,255,255,0.02)",
+              background: p.isMing ? "rgba(184,115,51,0.1)" : "rgba(255,255,255,0.55)",
               borderColor: p.isMing ? "var(--ac-bdr)" : "var(--bdr)",
             }}
           >

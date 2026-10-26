@@ -5,6 +5,7 @@ import ClearDataButton from "@/components/ClearDataButton";
 import DomainReading from "@/components/DomainReading";
 import type { BirthInput, TemplateReading } from "@/lib/shared/types";
 import type { HDChart } from "@/lib/humandesign/reading";
+import { saveModuleReading } from "@/lib/shared/compare-store";
 
 export default function HumanDesignPage() {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function HumanDesignPage() {
           <h1 className="text-2xl font-semibold text-[var(--ac)]">人類圖</h1>
           <p className="text-sm text-[var(--tx-2)] mt-1">Type / Authority / Profile / Centers / Channels</p>
         </div>
-        <ClearDataButton onClear={() => { setChart(null); setReading(null); setError(""); }} />
+        <ClearDataButton moduleId="humandesign" onClear={() => { setChart(null); setReading(null); setError(""); }} />
       </div>
       <BirthForm
         loading={loading}
@@ -37,6 +38,7 @@ export default function HumanDesignPage() {
             if (!res.ok) throw new Error(data.error || "失敗");
             setChart(data.chart);
             setReading(data.reading);
+            if (data.reading) saveModuleReading("humandesign", data.reading);
           } catch (e) {
             setError(e instanceof Error ? e.message : "錯誤");
           } finally {
@@ -44,7 +46,7 @@ export default function HumanDesignPage() {
           }
         }}
       />
-      {error && <p className="text-red-400 text-sm whitespace-pre-wrap">{error}</p>}
+      {error && <p className="text-red-600 text-sm whitespace-pre-wrap">{error}</p>}
       {chart && (
         <div className="card p-5 space-y-2 text-sm">
           <div className="flex flex-wrap gap-2">

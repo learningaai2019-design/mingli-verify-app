@@ -8,9 +8,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: { 0: "#020810", 1: "#0a1020", 2: "#141e30" },
-        tx: { 0: "#e8eef6", 1: "#dce4f0", 2: "#9db0d0", 3: "#6a7a96" },
-        ac: { DEFAULT: "#d4a843", dim: "#e8c060" },
+        bg: { 0: "#fff8f0", 1: "#fff3e6", 2: "#ffe8d2" },
+        tx: { 0: "#3a2a1a", 1: "#4a3728", 2: "#7a634f", 3: "#9a8470" },
+        ac: { DEFAULT: "#b87333", dim: "#d4924a" },
       },
       fontFamily: {
         sans: ["var(--font)"],

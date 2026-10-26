@@ -6,6 +6,7 @@ import DomainReading from "@/components/DomainReading";
 import ZiweiBoard from "@/components/ZiweiBoard";
 import type { BirthInput, TemplateReading } from "@/lib/shared/types";
 import type { ZiweiChartView } from "@/lib/ziwei/engine";
+import { saveModuleReading } from "@/lib/shared/compare-store";
 
 export default function ZiweiPage() {
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ export default function ZiweiPage() {
           <h1 className="text-2xl font-semibold text-[var(--ac)]">紫微斗數</h1>
           <p className="text-sm text-[var(--tx-2)] mt-1">iztro 排盘 · 模板解讀 · 非倪師授權／非專有數據集</p>
         </div>
-        <ClearDataButton onClear={() => { setChart(null); setReading(null); setError(""); }} />
+        <ClearDataButton moduleId="ziwei" onClear={() => { setChart(null); setReading(null); setError(""); }} />
       </div>
       <BirthForm
         loading={loading}
@@ -38,6 +39,7 @@ export default function ZiweiPage() {
             if (!res.ok) throw new Error(data.error || "失敗");
             setChart(data.chart);
             setReading(data.reading);
+            if (data.reading) saveModuleReading("ziwei", data.reading);
           } catch (e) {
             setError(e instanceof Error ? e.message : "錯誤");
           } finally {
@@ -45,7 +47,7 @@ export default function ZiweiPage() {
           }
         }}
       />
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       {chart && <ZiweiBoard chart={chart} />}
       {reading && <DomainReading reading={reading} />}
     </div>

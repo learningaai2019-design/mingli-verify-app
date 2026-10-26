@@ -47,3 +47,9 @@ Cultural-reference tooling for consultant QA. Not medical, legal, or investment 
 - 紫微：排盘用 `iztro`，解讀為自研模板，非倪海廈教材／專有數據。
 - 西洋／人類圖：依賴 box 上 `/workspace/.venv-astro`（kerykeion）。
 - 解讀全部為規則／模板；可選 LLM key 未強制接入主流程。
+
+## UI / 系統比對 (2026-10)
+
+- Warm light theme + subtle decorative SVG background (`public/bg-pattern.svg`).
+- `/compare`「系統比對」: after running 2+ modules, side-by-side matrix / cards across domains.
+- Compare cache: **sessionStorage** holds reading summaries only (no birth dates / names). Cleared on tab close or via clear buttons.

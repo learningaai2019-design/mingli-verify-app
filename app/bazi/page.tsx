@@ -5,6 +5,7 @@ import ClearDataButton from "@/components/ClearDataButton";
 import DomainReading from "@/components/DomainReading";
 import type { BirthInput, TemplateReading } from "@/lib/shared/types";
 import type { BaziChart } from "@/lib/bazi/engine";
+import { saveModuleReading } from "@/lib/shared/compare-store";
 
 export default function BaziPage() {
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,7 @@ export default function BaziPage() {
       if (!res.ok) throw new Error(data.error || "失敗");
       setChart(data.chart);
       setReading(data.reading);
+      if (data.reading) saveModuleReading("bazi", data.reading);
     } catch (e) {
       setError(e instanceof Error ? e.message : "錯誤");
     } finally {
@@ -45,6 +47,7 @@ export default function BaziPage() {
           </p>
         </div>
         <ClearDataButton
+          moduleId="bazi"
           onClear={() => {
             setChart(null);
             setReading(null);
@@ -68,7 +71,7 @@ export default function BaziPage() {
           更新流年解讀
         </button>
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       {chart && (
         <div className="card p-5 space-y-3">
           <h2 className="section-title">四柱</h2>
@@ -78,7 +81,7 @@ export default function BaziPage() {
               const p = chart[k];
               const label = ["年柱", "月柱", "日柱", "時柱"][i];
               return (
-                <div key={k} className="rounded-lg border border-[var(--bdr)] p-3">
+                <div key={k} className="rounded-lg border border-[var(--bdr)] p-3 bg-white/50">
                   <div className="text-[11px] text-[var(--tx-3)]">{label}</div>
                   <div className="text-2xl text-[var(--ac)] font-semibold mt-1">
                     {p.stem}

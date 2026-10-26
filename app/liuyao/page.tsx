@@ -2,6 +2,7 @@
 import { useState } from "react";
 import ClearDataButton from "@/components/ClearDataButton";
 import type { LiuyaoResult, YaoValue } from "@/lib/liuyao/engine";
+import { saveCustomSections } from "@/lib/shared/compare-store";
 
 const QTYPES = ["一般", "事业", "财运", "感情", "健康", "诉讼", "出行"];
 const YAO_OPTS: { v: YaoValue; label: string }[] = [
@@ -10,6 +11,32 @@ const YAO_OPTS: { v: YaoValue; label: string }[] = [
   { v: 9, label: "老阳 ○" },
   { v: 6, label: "老阴 ×" },
 ];
+
+function persistLiuyao(result: LiuyaoResult, questionType: string) {
+  const domainKey =
+    questionType.includes("财") ? "財帛" :
+    questionType.includes("感") ? "感情" :
+    questionType.includes("健") ? "健康" :
+    questionType.includes("业") || questionType.includes("業") ? "事業" :
+    "性格";
+  saveCustomSections(
+    "liuyao",
+    "六爻模板短判",
+    result.disclaimer || "規則／模板解讀・文化參考",
+    [
+      {
+        key: domainKey,
+        title: domainKey,
+        text: `本卦 ${result.benName}${result.zhiName ? ` → 變卦 ${result.zhiName}` : ""}。用神：${result.yongShen}。短判：${result.verdict}`,
+      },
+      {
+        key: "盤面總論",
+        title: "盤面總論",
+        text: result.programNotes.join("\n"),
+      },
+    ],
+  );
+}
 
 export default function LiuyaoPage() {
   const [mode, setMode] = useState<"coin" | "time" | "manual">("coin");
@@ -35,6 +62,7 @@ export default function LiuyaoPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "失敗");
       setResult(data.result);
+      if (data.result) persistLiuyao(data.result, questionType);
     } catch (e) {
       setError(e instanceof Error ? e.message : "錯誤");
     } finally {
@@ -49,7 +77,7 @@ export default function LiuyaoPage() {
           <h1 className="text-2xl font-semibold text-[var(--ac)]">六爻</h1>
           <p className="text-sm text-[var(--tx-2)] mt-1">装卦 · 用神 · 五大纲领短判 · 愚人公開線結構披露</p>
         </div>
-        <ClearDataButton onClear={() => { setResult(null); setError(""); }} />
+        <ClearDataButton moduleId="liuyao" onClear={() => { setResult(null); setError(""); }} />
       </div>
       <div className="card p-5 space-y-4">
         <div>
@@ -118,7 +146,7 @@ export default function LiuyaoPage() {
           {loading ? "起卦中…" : "起卦並装卦"}
         </button>
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       {result && (
         <div className="card p-5 space-y-4">
           <div className="flex flex-wrap gap-2">

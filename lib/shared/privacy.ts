@@ -1,20 +1,21 @@
-/** Client-side privacy helpers — never persist PII. */
+/** Client-side privacy helpers — never persist birth/name PII on the server. */
 
 export const PRIVACY_COPY = {
   banner:
-    "私隱優先：所有出生／姓名／卦象資料只存在呢次瀏覽器記憶體內，唔會寫入資料庫、localStorage、Cookie 或伺服器日誌。重新整理即清除。",
+    "私隱優先：出生／姓名等個人資料只留喺呢次瀏覽器記憶體，唔會寫入伺服器資料庫。比對用摘要可選存 sessionStorage（關分頁即清），唔含出生資料。",
   clear: "清除本機資料",
   cleared: "已清除本頁暫存結果",
   pageTitle: "私隱政策",
 };
 
 export function assertNoPersist() {
-  // Intentionally no-op documenter for reviewers.
   return {
     db: false,
     localStoragePII: false,
     cookiesBirth: false,
     serverInputLogs: false,
     sessionOnly: true,
+    /** Reading summaries only (no birth/name) may live in sessionStorage for 系統比對. */
+    sessionStorageReadingsOnly: true,
   };
 }

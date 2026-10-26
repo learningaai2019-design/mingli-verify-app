@@ -11,14 +11,15 @@ const NAV = [
   { href: "/humandesign", label: "人類圖" },
   { href: "/liuyao", label: "六爻" },
   { href: "/name", label: "姓名" },
+  { href: "/compare", label: "系統比對" },
   { href: "/privacy", label: "私隱" },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-[var(--bdr)] backdrop-blur-md bg-[rgba(2,8,16,0.85)]">
+    <div className="app-bg min-h-screen flex flex-col">
+      <header className="sticky top-0 z-40 border-b border-[var(--bdr)] backdrop-blur-md bg-[var(--header-bg)]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
           <Link href="/" className="font-semibold tracking-wide text-[var(--ac)]">
             命理核對 · Mingli Verify
@@ -35,6 +36,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     color: active ? "var(--ac)" : "var(--tx-2)",
                     background: active ? "var(--ac-bg)" : "transparent",
                     border: active ? "1px solid var(--ac-bdr)" : "1px solid transparent",
+                    fontWeight: n.href === "/compare" ? 600 : undefined,
                   }}
                 >
                   {n.label}
@@ -48,10 +50,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8">{children}</main>
-      <footer className="border-t border-[var(--bdr)] text-center text-xs text-[var(--tx-3)] py-6 px-4">
+      <footer className="border-t border-[var(--bdr)] text-center text-xs text-[var(--tx-3)] py-6 px-4 bg-[rgba(255,248,240,0.6)]">
         MIT · 規則／模板解讀・文化參考 · 唔構成專業諮詢保證 ·{" "}
         <Link href="/privacy" className="text-[var(--ac)] underline-offset-2 hover:underline">
           私隱政策
+        </Link>
+        {" · "}
+        <Link href="/compare" className="text-[var(--ac)] underline-offset-2 hover:underline">
+          系統比對
         </Link>
       </footer>
     </div>

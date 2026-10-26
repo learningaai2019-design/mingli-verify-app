@@ -1,17 +1,21 @@
 "use client";
 import { PRIVACY_COPY } from "@/lib/shared/privacy";
+import { clearModuleResult, type ModuleId } from "@/lib/shared/compare-store";
 
-export default function ClearDataButton({ onClear }: { onClear: () => void }) {
+export default function ClearDataButton({
+  onClear,
+  moduleId,
+}: {
+  onClear: () => void;
+  moduleId?: ModuleId;
+}) {
   return (
     <button
       type="button"
       className="btn-ghost"
       onClick={() => {
         onClear();
-        // Explicitly do NOT write PII anywhere; only clear React state via parent.
-        try {
-          // Theme preference only — never birth data
-        } catch { /* ignore */ }
+        if (moduleId) clearModuleResult(moduleId);
       }}
     >
       {PRIVACY_COPY.clear}
