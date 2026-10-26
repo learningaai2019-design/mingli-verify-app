@@ -16,7 +16,11 @@ export default function PrivacyPage() {
             「系統比對」可選將<strong>解讀摘要</strong>（唔含出生日期／姓名）暫存喺瀏覽器 sessionStorage；
             關閉分頁即清除（sessionStorageReadingsOnly = {String(flags.sessionStorageReadingsOnly)}）
           </li>
-          <li>各模組頁面有「{PRIVACY_COPY.clear}」按鈕，可即時清掉本頁結果同對應比對暫存</li>
+          <li>
+            「大事年表 · 事實核對」只保存你喺瀏覽器輸入嘅年份／事件短述同中／一半／唔中標記（sessionStorage）；
+            唔會連同出生日期一齊上傳或寫入伺服器
+          </li>
+          <li>各模組頁面有「{PRIVACY_COPY.clear}」按鈕，可即時清掉本頁結果同對應比對暫存；大事年表另有「清除大事年表」</li>
         </ul>
         <p className="text-[var(--tx-3)]">
           可選 LLM API key 若存在，亦唔會將含 PII 嘅 prompt 寫入磁碟。請勿喺共用電腦留下未清除嘅畫面截圖。

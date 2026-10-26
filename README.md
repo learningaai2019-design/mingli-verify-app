@@ -53,3 +53,4 @@ Cultural-reference tooling for consultant QA. Not medical, legal, or investment 
 - Warm light theme + subtle decorative SVG background (`public/bg-pattern.svg`).
 - `/compare`「系統比對」: after running 2+ modules, side-by-side matrix / cards across domains.
 - Compare cache: **sessionStorage** holds reading summaries only (no birth dates / names). Cleared on tab close or via clear buttons.
+- `/compare`「大事年表 · 事實核對」: enter 2010–2026 life events, mark 中／一半／唔中 (optional per-system + optional 參考建議). Client-only sessionStorage; clear button on the panel.

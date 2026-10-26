@@ -11,6 +11,7 @@ import {
   type ModuleId,
   type StoredModuleResult,
 } from "@/lib/shared/compare-store";
+import LifeEventsPanel from "@/components/LifeEventsPanel";
 
 type ViewMode = "matrix" | "cards";
 
@@ -66,6 +67,11 @@ export default function ComparePage() {
           <p className="text-sm text-[var(--tx-2)] mt-1 max-w-xl">
             試完唔同系統之後，喺呢度並排睇性格／事業／財運／感情／健康等領域，方便核對邊啲講法相近、邊啲有出入。
             只讀 sessionStorage 入面嘅解讀摘要（唔含出生日期／姓名）。
+          </p>
+          <p className="text-xs text-[var(--tx-3)] mt-2">
+            <a href="#life-events" className="text-[var(--ac)] underline-offset-2 hover:underline">
+              ↓ 跳去大事年表 · 事實核對
+            </a>
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -227,8 +233,10 @@ export default function ComparePage() {
         </>
       )}
 
+      <LifeEventsPanel moduleResults={active.length ? active : results} />
+
       <p className="text-xs text-[var(--tx-3)] leading-relaxed">
-        免責：比對只幫測試者觀察唔同系統模板輸出，唔等於「邊個準」或專業斷語。請自行判斷，文化參考而已。
+        免責：比對同事實核對只幫測試者觀察唔同系統模板輸出，唔等於「邊個準」或專業斷語。請自行判斷，文化參考而已。
       </p>
     </div>
   );
