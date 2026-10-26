@@ -93,24 +93,47 @@ const ZIWEI_DOMAINS: { palace: string; title: string }[] = [
   { palace: "父母", title: "父母" },
 ];
 
-function starBlurb(stars: string[]): string {
-  if (!stars.length) return "本宮無主星，借對宮論事，性格較彈性。";
+
+function starPersonVoice(stars: string[]): string {
+  if (!stars.length) return "本宮無主星、多借對宮——彈性大，亦容易「睇情況先定」，要自己立主心骨。";
   const s = stars.join("、");
-  if (stars.some((x) => x.includes("紫微"))) return `主星${s}：領導與自尊主題較強。`;
-  if (stars.some((x) => x.includes("天機"))) return `主星${s}：思慮機變、計劃性強。`;
-  if (stars.some((x) => x.includes("太陽"))) return `主星${s}：外放、貴氣、需注意消耗。`;
-  if (stars.some((x) => x.includes("武曲"))) return `主星${s}：務實果斷、財星意象。`;
-  if (stars.some((x) => x.includes("天同"))) return `主星${s}：享樂溫和、不宜過逸。`;
-  if (stars.some((x) => x.includes("廉貞"))) return `主星${s}：情感張力、是非與二次機會。`;
-  if (stars.some((x) => x.includes("天府"))) return `主星${s}：穩守庫星、節制為貴。`;
-  if (stars.some((x) => x.includes("太陰"))) return `主星${s}：內斂細膩、夜間／不動產意象。`;
-  if (stars.some((x) => x.includes("貪狼"))) return `主星${s}：欲望、才藝、社交魅力。`;
-  if (stars.some((x) => x.includes("巨門"))) return `主星${s}：口才、爭議、真相探尋。`;
-  if (stars.some((x) => x.includes("天相"))) return `主星${s}：輔佐、形象、禮儀。`;
-  if (stars.some((x) => x.includes("天梁"))) return `主星${s}：清貴蔭庇、長輩緣。`;
-  if (stars.some((x) => x.includes("七殺"))) return `主星${s}：開創衝鋒、壓力轉化為成就。`;
-  if (stars.some((x) => x.includes("破軍"))) return `主星${s}：破舊立新、變動大。`;
-  return `主星${s}：按宮位職能發揮。`;
+  if (stars.some((x) => x.includes("天同") && stars.some((y) => y.includes("太陰")))) {
+    return `主星${s}：要舒適、情感細、記恩亦記唔舒服；外表可柔，內裡要有份話事權，唔肯完全交權。`;
+  }
+  if (stars.some((x) => x.includes("紫微"))) return `主星${s}：自尊同領導欲較顯，要被尊重，亦要學聽人完場再決。`;
+  if (stars.some((x) => x.includes("天機"))) return `主星${s}：腦快、愛計劃、易改方案；精準同內耗只差一線，交付日要敢停。`;
+  if (stars.some((x) => x.includes("太陽"))) return `主星${s}：外放有光，亦易耗——被看見嘅同時要留休息。`;
+  if (stars.some((x) => x.includes("武曲"))) return `主星${s}：務實果斷，錢同結果導向；溝通記得留溫度。`;
+  if (stars.some((x) => x.includes("天同"))) return `主星${s}：要舒服、要和氣，忌長期被催到無喘息；適度享樂可以，過逸會悶。`;
+  if (stars.some((x) => x.includes("廉貞"))) return `主星${s}：情感張力、二次機會同是非都可能近身；界線要清。`;
+  if (stars.some((x) => x.includes("天府"))) return `主星${s}：穩守、節制、庫星味道；少為面子撐場面。`;
+  if (stars.some((x) => x.includes("太陰"))) return `主星${s}：內斂細膩，夜間思緒活躍；不動產／家庭安全感對你重要。`;
+  if (stars.some((x) => x.includes("貪狼"))) return `主星${s}：好奇、多欲（學問／美／關係／機會），一生難「無慾」，宜導向才藝同專業。`;
+  if (stars.some((x) => x.includes("巨門"))) return `主星${s}：口才同爭議並存，真相探尋強；講真話前留一夜更穩。`;
+  if (stars.some((x) => x.includes("天相"))) return `主星${s}：輔佐、形象、禮儀；適合協調，忌只做和事佬無立場。`;
+  if (stars.some((x) => x.includes("天梁"))) return `主星${s}：有原則、長輩緣、被人指望；小心變成成日幫人善後抽唔到身。`;
+  if (stars.some((x) => x.includes("七殺"))) return `主星${s}：開創衝鋒，壓力可轉成就；平順時反而要自找目標。`;
+  if (stars.some((x) => x.includes("破軍"))) return `主星${s}：破舊立新、變動大；換交貨方式，唔好當世界末日。`;
+  return `主星${s}：按宮位職能發揮，重在你點樣用，而唔係標籤本身。`;
+}
+
+function palaceAdvice(palace: string, stars: string[]): string {
+  const soft = starPersonVoice(stars);
+  const map: Record<string, string> = {
+    命宮: "性格底色喺呢度——你做決定時返覆出現嘅節奏，多過一句「好定壞」。",
+    兄弟: "手足同近朋：有緣亦要界線；錢銀合作寫低。",
+    夫妻: "親密關係要講責任同名份；戰友式溝通，好過互相用腦審。",
+    子女: "親職或你交出去嘅作品／團隊——標準高可以，支援要跟到。",
+    財帛: "錢同「被需要／被聽到」有時綁埋；有價、有單、有程序。",
+    疾厄: "只係作息同身體提醒；有事睇醫生，呢度唔係診斷。",
+    遷移: "外出、變動、他鄉機會——行之前問自己係開拓定逃避。",
+    交友: "朋友圈篩選：出事現身大過熱鬧；新識三個月內唔好大額往來。",
+    官祿: "事業腦同理想；想得多就要有交付日，留得住累積資產。",
+    田宅: "家居要瞓得著、有安全感；合約自己覆核。",
+    福德: "精神帳：夜間思緒、觀念輸出——留空白，先唔會耗乾。",
+    父母: "長輩緣同求助渠道；坦誠開口，同時回報心意。",
+  };
+  return `${soft}${map[palace] || "按宮位職能，配合人生核對。"}`;
 }
 
 export function ziweiTemplateReading(chart: ZiweiChartView): TemplateReading {
@@ -119,27 +142,35 @@ export function ziweiTemplateReading(chart: ZiweiChartView): TemplateReading {
     const p = byName[palace] || byName[palace + "宮"];
     const stars = p?.majorStars || [];
     const branch = p?.earthlyBranch || "—";
+    const minor = p?.minorStars?.length ? `輔星見 ${p.minorStars.slice(0, 5).join("、")}，可作細節提示，唔使迷信。` : "";
     return {
       key: palace,
       title,
-      text: `${palace}（${branch}）：${starBlurb(stars)}${p?.minorStars?.length ? ` 輔星見 ${p.minorStars.slice(0, 5).join("、")}。` : ""}`,
+      text: `${palace}（${branch}）：${palaceAdvice(palace, stars)}${minor}`,
     };
   });
   sections.unshift({
     key: "總論",
     title: "盤面總論",
-    text: `五行局：${chart.fiveElementsClass || "—"}；命主 ${chart.soul}、身主 ${chart.body}。${chart.schoolNote}`,
+    text: `五行局：${chart.fiveElementsClass || "—"}；命主 ${chart.soul}、身主 ${chart.body}。若用生活語言：呢張盤講緊你點樣要舒適又要話事、點樣用腦力多過蠻力行人生。${chart.schoolNote}`,
   });
   const ming = byName["命宮"] || byName["命"];
   const mingStars = (ming?.majorStars || []).join("、") || "借對宮";
+  const cai = byName["財帛"] || byName["財帛宮"];
+  const guan = byName["官祿"] || byName["官祿宮"];
   sections.push({
     key: "口語綜合",
     title: "口語綜合",
-    text: `講真，呢張紫微盤睇落，你係一個「命主 ${chart.soul}、身主 ${chart.body}」底色嘅人，五行局${chart.fiveElementsClass || "未明"}，命宮主星約係${mingStars}——唔係標籤，而係你日常做決定時會返覆出現嘅節奏。事業同財帛宮提醒你：有架構就守交付，有庫就節制；感情同父母線則靠坦白溝通多過靠猜。健康方面，疾厄宮只係提醒作息，有事睇醫生，呢度唔係診斷。最後一句：紫微係文化地圖，你肯做嘅小步驟——回覆訊息、規律睡眠、錢銀寫低——往往比任何「必準」斷語更改寫今年結局。`,
+    text: [
+      `講真，望住呢張紫微盤，我會把你講成一個「命主 ${chart.soul}、身主 ${chart.body}」底色嘅人——五行局${chart.fiveElementsClass || "未明"}，命宮主星約係${mingStars}。呢啲唔係貼紙，而係你日常做決定時會返嚟嘅節奏：要美、要對、要有份話事，亦要安全感。`,
+      `事業（官祿見 ${(guan?.majorStars || []).join("、") || "借對宮"}）同財帛（${(cai?.majorStars || []).join("、") || "借對宮"}）提醒你：有架構就守交付，有庫就節制；自我價值若同「被聽到／被需要」綁埋，就要用專業同收費程序托住，唔好淨靠感覺。`,
+      `感情同父母線靠坦白溝通多過靠猜；健康方面疾厄宮只係提醒作息，有事睇醫生。`,
+      `最後一句：紫微係文化地圖。你肯做嘅小步驟——回覆訊息、規律睡眠、錢銀寫低、把想法收成可交付成品——往往比任何「必準」斷語更改寫今年結局。我寧願你用人生核對，多過我扮好準。`,
+    ].join("\n\n"),
   });
   return {
-    label: "規則／模板解讀・文化參考",
-    disclaimer: "紫微解讀為模板引擎，披露流派為 iztro／中州派常見排盘參數；非任何特定名師授權教材。文化參考，唔作必準保證。",
+    label: "規則／顧問口語解讀・文化參考",
+    disclaimer: "紫微解讀為規則引擎，披露流派為 iztro／中州派常見排盘參數；非任何特定名師授權教材。文化參考，唔作必準保證。",
     sections,
   };
 }
