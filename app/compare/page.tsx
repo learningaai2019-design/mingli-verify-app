@@ -70,7 +70,7 @@ export default function ComparePage() {
           </p>
           <p className="text-xs text-[var(--tx-3)] mt-2">
             <a href="#life-events" className="text-[var(--ac)] underline-offset-2 hover:underline">
-              ↓ 跳去大事年表 · 事實核對
+              ↓ 跳去大事年表 · 自動核對（App 判斷中／一半／唔中）
             </a>
           </p>
         </div>
@@ -236,7 +236,7 @@ export default function ComparePage() {
       <LifeEventsPanel moduleResults={active.length ? active : results} />
 
       <p className="text-xs text-[var(--tx-3)] leading-relaxed">
-        免責：比對同事實核對只幫測試者觀察唔同系統模板輸出，唔等於「邊個準」或專業斷語。請自行判斷，文化參考而已。
+        免責：系統比對同大事自動核對只幫測試者觀察模板輸出同啟發式主題對照，屬文化參考，唔等於「邊個準」、專業斷語或保證。自動「中／一半／唔中」唔係占卜結果。
       </p>
     </div>
   );

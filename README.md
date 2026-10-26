@@ -36,6 +36,10 @@ Open **http://localhost:3456**
 
 Western / Human Design need `/workspace/.venv-astro` (kerykeion). Override with `ASTRO_PYTHON=/path/to/python` if needed.
 
+## 大事核對（/compare）
+
+Enter 2010–2026 life events → App **auto-judges** 中／一半／唔中 by heuristic theme match against cached module readings (prefers 流年 sections when the year aligns). Per-system reasons in Cantonese. Manual override is optional/secondary. sessionStorage only.
+
 ## Disclaimer
 
 Cultural-reference tooling for consultant QA. Not medical, legal, or investment advice. MIT-licensed original app; visual patterns inspired by public demo aesthetics only.
