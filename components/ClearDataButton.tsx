@@ -13,7 +13,7 @@ export default function ClearDataButton({
   return (
     <button
       type="button"
-      className="btn-ghost"
+      className="btn-ghost shrink-0 self-start"
       onClick={() => {
         onClear();
         if (moduleId) clearModuleResult(moduleId);

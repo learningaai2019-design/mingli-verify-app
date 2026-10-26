@@ -44,8 +44,9 @@ export default function DomainReading({ reading }: { reading: TemplateReading })
   const blocks = partition(reading.sections);
   return (
     <div className="card p-5 space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="badge">{reading.label}</span>
+        <span className="text-[11px] text-[var(--tx-3)]">解讀結果</span>
       </div>
       <p className="text-xs text-[var(--tx-3)] leading-relaxed">{reading.disclaimer}</p>
       <div className="space-y-3">
