@@ -52,49 +52,49 @@ const THEME_GROUPS: { id: string; label: string; eventHints: string[]; sectionHi
     id: "career",
     label: "事業",
     eventHints: ["轉工", "辭職", "失業", "入職", "升職", "調職", "開工", "創業", "生意", "工作", "事業", "面試", "裁員", "跳槽", "職位", "上司", "公司", "開業", "倒閉", "freelance"],
-    sectionHints: ["事業", "官祿", "流年事業", "流年・事業", "事業取向", "行動", "事業擴張"],
+    sectionHints: ["事業", "官祿", "流年事業", "流年・事業", "事業取向", "行動", "事業擴張", "大運事業"],
   },
   {
     id: "wealth",
     label: "財運",
     eventHints: ["財", "錢", "投資", "虧", "賺", "收入", "加薪", "減薪", "買樓按揭", "債務", "借貸", "破產", "中獎", "生意額", "財富"],
-    sectionHints: ["財運", "財帛", "流年財運", "流年・財運", "財帛資源"],
+    sectionHints: ["財運", "財帛", "流年財運", "流年・財運", "財帛資源", "大運財運"],
   },
   {
     id: "love",
     label: "感情",
     eventHints: ["結婚", "離婚", "分手", "拍拖", "戀愛", "訂婚", "復合", "出軌", "結婚", "婚禮", "伴侶", "配偶", "感情", "男友", "女友", "老公", "老婆"],
-    sectionHints: ["感情", "夫妻", "流年夫妻", "流年・婚姻", "伴侶", "關係"],
+    sectionHints: ["感情", "夫妻", "流年夫妻", "流年・婚姻", "伴侶", "關係", "大運感情"],
   },
   {
     id: "health",
     label: "健康",
     eventHints: ["病", "手術", "住院", "健康", "受傷", "意外", "產後", "懷孕", "產子", "生仔", "生女", "癌症", "抑鬱", "焦慮", "身體", "覆診", "康復"],
-    sectionHints: ["健康", "疾厄", "流年健康", "流年・健康", "健康節奏"],
+    sectionHints: ["健康", "疾厄", "流年健康", "流年・健康", "健康節奏", "大運健康"],
   },
   {
     id: "home",
     label: "田宅／搬遷",
     eventHints: ["搬屋", "搬家", "裝修", "買樓", "賣樓", "租屋", "移民", "出國", "旅居", "安家", "置業", "收樓", "田宅", "遷移"],
-    sectionHints: ["田宅", "遷移", "流年田宅", "流年・田宅", "外出／遷移", "家居"],
+    sectionHints: ["田宅", "遷移", "流年田宅", "流年・田宅", "外出／遷移", "家居", "大運"],
   },
   {
     id: "family",
     label: "家人／人際",
     eventHints: ["父母", "爸爸", "媽媽", "阿爸", "阿媽", "兄弟", "姊妹", "仔女", "子女", "親友", "朋友", "人際", "爭執", "和解", "離世", "喪", "生育"],
-    sectionHints: ["父母", "兄弟", "子女", "朋輩", "流年父母", "流年兄弟", "流年子女", "流年朋輩", "交友"],
+    sectionHints: ["父母", "兄弟", "子女", "朋輩", "流年父母", "流年兄弟", "流年子女", "流年朋輩", "交友", "大運性格", "大運"],
   },
   {
     id: "study",
     label: "學業",
     eventHints: ["讀書", "考試", "畢業", "入學", "退學", "進修", "學業", "學位", "論文", "DSE", "公開試", "留學"],
-    sectionHints: ["學業", "流年學業", "流年・學業", "思考"],
+    sectionHints: ["學業", "流年學業", "流年・學業", "思考", "大運性格"],
   },
   {
     id: "life",
     label: "人生節奏",
     eventHints: ["轉折", "轉運", "低潮", "高峰", "壓力", "休息", "轉型", "改變", "危機", "轉機", "大事"],
-    sectionHints: ["流年總論", "口語綜合", "早年到晚年", "福德", "人生", "輪廓", "情緒"],
+    sectionHints: ["流年總論", "口語綜合", "早年到晚年", "福德", "人生", "輪廓", "情緒", "十年大運", "大運"],
   },
 ];
 
@@ -243,6 +243,32 @@ function detectCachedLiunianYear(result: StoredModuleResult): number | null {
   return null;
 }
 
+/** True if section is a 大運 block whose year span covers eventYear (e.g. title …（2017–2026）). */
+function dayunCoversYear(title: string, key: string, text: string, eventYear: number): boolean {
+  const isDayun =
+    key.includes("大運") ||
+    title.includes("大運") ||
+    key === "十年大運" ||
+    title.includes("十年大運");
+  if (!isDayun) return false;
+  const span = (title + " " + text.slice(0, 120)).match(/(19\d{2}|20\d{2})\s*[–—-]\s*(19\d{2}|20\d{2})/);
+  if (span) {
+    const a = Number(span[1]);
+    const b = Number(span[2]);
+    return eventYear >= Math.min(a, b) && eventYear <= Math.max(a, b);
+  }
+  // overview may list multiple spans — check any "YYYY–YYYY" in text
+  const re = /(19\d{2}|20\d{2})\s*[–—-]\s*(19\d{2}|20\d{2})/g;
+  let m: RegExpExecArray | null;
+  const blob = title + "\n" + text;
+  while ((m = re.exec(blob))) {
+    const a = Number(m[1]);
+    const b = Number(m[2]);
+    if (eventYear >= Math.min(a, b) && eventYear <= Math.max(a, b)) return true;
+  }
+  return blob.includes(String(eventYear));
+}
+
 function scoreModule(
   event: LifeEvent,
   result: StoredModuleResult,
@@ -254,12 +280,13 @@ function scoreModule(
   const cachedYear = detectCachedLiunianYear(result);
   const yearMatchesCache = cachedYear === event.year;
 
-  // Prefer year-luck / year-titled sections when present AND year aligns
+  // Prefer year-luck / 大運-covering / year-titled sections when present AND year aligns
   const yearSections = result.sections.filter(
     (s) =>
       s.title.includes(yearStr) ||
       s.text.includes(yearStr) ||
       s.title.includes(yearHint) ||
+      dayunCoversYear(s.title, s.key, s.text, event.year) ||
       (yearMatchesCache && (s.key.startsWith("流年") || s.title.includes("流年"))),
   );
 
@@ -269,14 +296,16 @@ function scoreModule(
     for (const s of result.sections) {
       if (!sectionMatchesTheme(s.title, s.key, theme.sectionHints)) continue;
       const isLiunian = s.key.startsWith("流年") || s.title.includes("流年");
+      const coversDayun = dayunCoversYear(s.title, s.key, s.text, event.year);
       const yearScoped =
         s.title.includes(yearStr) ||
         s.text.includes(yearStr) ||
+        coversDayun ||
         (isLiunian && yearMatchesCache);
       themeMatchedSections.push({
         title: s.title || s.key,
         text: s.text,
-        themeLabel: theme.label,
+        themeLabel: coversDayun ? `${theme.label}／大運` : theme.label,
         yearScoped,
       });
     }
@@ -284,7 +313,10 @@ function scoreModule(
 
   // Fallback: whole blob keyword overlap
   const blob = result.sections.map((s) => `${s.title}\n${s.text}`).join("\n");
-  const yearInBlob = blob.includes(yearStr) || blob.includes(yearHint);
+  const yearInBlob =
+    blob.includes(yearStr) ||
+    blob.includes(yearHint) ||
+    result.sections.some((s) => dayunCoversYear(s.title, s.key, s.text, event.year));
   let tokenHits = 0;
   for (const t of tokens) {
     if (blob.includes(t)) tokenHits += 1;
@@ -319,9 +351,18 @@ function scoreModule(
   let mark: FactMark;
   let reason: string;
 
-  if (yearThemeHits.length && (themeRatio >= 0.2 || eventChange === readingChange)) {
-    mark = themeRatio >= 0.15 || readingChange === eventChange ? "hit" : "half";
-    reason = `對上${MODULE_META[result.moduleId]?.label || result.label}「${yearThemeHits[0].title}」主題（${bestTheme}），同${event.year}年流年／範疇方向${mark === "hit" ? "合拍" : "部分合拍"}。`;
+  const dayunHit = yearThemeHits.some(
+    (s) => s.title.includes("大運") || s.themeLabel.includes("大運"),
+  ) || yearSections.some((s) => dayunCoversYear(s.title, s.key || "", s.text, event.year));
+
+  if (yearThemeHits.length && (themeRatio >= 0.2 || eventChange === readingChange || dayunHit)) {
+    mark = themeRatio >= 0.12 || readingChange === eventChange || dayunHit ? "hit" : "half";
+    reason = dayunHit
+      ? `對上${MODULE_META[result.moduleId]?.label || result.label}覆蓋${event.year}年嘅大運「${yearThemeHits[0]?.title || yearSections[0]?.title || "大運"}」（${bestTheme}），同大事方向${mark === "hit" ? "合拍" : "部分合拍"}。`
+      : `對上${MODULE_META[result.moduleId]?.label || result.label}「${yearThemeHits[0].title}」主題（${bestTheme}），同${event.year}年流年／範疇方向${mark === "hit" ? "合拍" : "部分合拍"}。`;
+  } else if (dayunHit && anyTheme) {
+    mark = "hit";
+    reason = `${event.year}年落喺${MODULE_META[result.moduleId]?.label || result.label}大運範圍，主題「${bestTheme}」有對位 → 中。`;
   } else if (anyTheme && yearInBlob) {
     mark = themeRatio >= 0.25 || tokenRatio >= 0.3 ? "hit" : "half";
     reason = `解讀有「${bestTheme}」相關段落，亦提到${event.year}年附近節奏；關鍵字重疊${mark === "hit" ? "夠高" : "一般"}，判${FACT_MARK_LABEL[mark]}。`;

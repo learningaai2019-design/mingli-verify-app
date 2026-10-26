@@ -15,11 +15,11 @@ Let others input birth / name / 卦 data and run analyses across all modules to 
 
 | Module | Engine | Notes |
 |--------|--------|-------|
-| 八字 | `lunar-javascript` | 四柱、真太陽時、十二領域＋流年各方面＋逐月加長批注＋口語綜合 |
+| 八字 | `lunar-javascript` | 四柱、真太陽時、**十年大運**（起運／干支／歲年／短批）、十二領域＋流年各方面＋逐月加長批注＋口語綜合 |
 | 紫微 | `iztro` | 排盘＋宮位模板；披露流派；**非倪師授權／非專有數據集** |
 | 西洋 | Python `kerykeion` via `/workspace/.venv-astro` | Tropical Placidus |
 | 人類圖 | same venv + gate wheel | Type / Authority / Profile / Centers / Channels |
-| 六爻 | in-house | 铜钱／手動／時間；用神；五大纲领短判；愚人公開線 disclaimer |
+| 六爻 | in-house | **一事一問**自由問題（必填）＋可選主題助手；铜钱／手動／時間；用神；五大纲领短判；拒占犯罪／不義財；愚人公開線 disclaimer |
 | 姓名 | 康熙筆畫表 | 五格三才；熊崎系華語主流 disclosure |
 
 All readings are labeled **「規則／模板解讀・文化參考」**. Optional `OPENAI_API_KEY` / Anthropic env vars are never required and never write PII prompts to disk.
@@ -38,7 +38,7 @@ Western / Human Design need `/workspace/.venv-astro` (kerykeion). Override with 
 
 ## 大事核對（/compare）
 
-Enter 2010–2026 life events → App **auto-judges** 中／一半／唔中 by heuristic theme match against cached module readings (prefers 流年 sections when the year aligns). Per-system reasons in Cantonese. Manual override is optional/secondary. sessionStorage only.
+Enter 2010–2026 life events → App **auto-judges** 中／一半／唔中 by heuristic theme match against cached module readings (prefers **大運** covering that year, then 流年 when year aligns). Per-system reasons in Cantonese. Manual override is optional/secondary. sessionStorage only.
 
 ## Disclaimer
 

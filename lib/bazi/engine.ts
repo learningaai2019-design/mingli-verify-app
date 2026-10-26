@@ -13,6 +13,36 @@ export interface BaziPillar {
   hiddenStems: string[];
 }
 
+export interface DayunStep {
+  index: number;
+  ganZhi: string;
+  startAge: number;
+  endAge: number;
+  startYear: number;
+  endYear: number;
+  /** 大運干對日主十神 */
+  stemShishen: string;
+  brief: {
+    personality: string;
+    career: string;
+    wealth: string;
+    love: string;
+    health: string;
+  };
+  /** 合併短批（給比對／大事核對用） */
+  summary: string;
+}
+
+export interface DayunSequence {
+  /** 起運說明 */
+  qiYunNote: string;
+  startAgeYears: number;
+  startAgeMonths: number;
+  startAgeDays: number;
+  startSolarYmd: string;
+  steps: DayunStep[];
+}
+
 export interface BaziChart {
   year: BaziPillar;
   month: BaziPillar;
@@ -24,6 +54,8 @@ export interface BaziChart {
   solarUsed: { year: number; month: number; day: number; hour: number; minute: number };
   trueSolarNote?: string;
   shishen: Record<string, string>;
+  /** 十年大運全序列（含起運） */
+  dayun: DayunSequence;
 }
 
 const STEM_ELEMENT: Record<string, string> = {
@@ -98,14 +130,212 @@ export function computeBazi(input: BirthInput): BaziChart {
     日支主氣: shishenOf(dayMaster, day.hiddenStems[0] || day.stem),
     時支主氣: shishenOf(dayMaster, hour.hiddenStems[0] || hour.stem),
   };
+  const genderLabel = input.gender === "male" ? "乾造" : "坤造";
+  const dayun = computeDayunSequence(eight as unknown as { getYun: (sex: number) => unknown }, input.gender === "male", dayMaster, y);
   return {
     year, month, day, hour,
     dayMaster,
     dayMasterElement: STEM_ELEMENT[dayMaster] || "—",
-    gender: input.gender === "male" ? "乾造" : "坤造",
+    gender: genderLabel,
     solarUsed: { year: y, month: m, day: d, hour: h, minute: mi },
     trueSolarNote,
     shishen,
+    dayun,
+  };
+}
+
+/** lunar-javascript EightChar.getYun(sex): 1=男 0=女 */
+function computeDayunSequence(
+  eight: { getYun: (sex: number) => unknown },
+  male: boolean,
+  dayMaster: string,
+  birthYear: number,
+): DayunSequence {
+  const yun = eight.getYun(male ? 1 : 0) as {
+    getStartYear: () => number;
+    getStartMonth: () => number;
+    getStartDay: () => number;
+    getStartSolar: () => { toYmd: () => string };
+    getDaYun: () => Array<{
+      getGanZhi: () => string;
+      getStartAge: () => number;
+      getEndAge: () => number;
+      getStartYear: () => number;
+      getEndYear: () => number;
+    }>;
+  };
+  const sy = yun.getStartYear();
+  const sm = yun.getStartMonth();
+  const sd = yun.getStartDay();
+  const startSolar = yun.getStartSolar();
+  const startSolarYmd = startSolar?.toYmd?.() || "";
+  const qiYunNote = `約${sy}歲${sm}個月${sd}日起運（陽曆約 ${startSolarYmd || "—"}）；${male ? "陽男／陰男按月令順逆" : "陰女／陽女按月令順逆"}由排盤引擎推算，文化參考。`;
+  const raw = yun.getDaYun() || [];
+  const steps: DayunStep[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const d = raw[i];
+    const gz = (d.getGanZhi() || "").trim();
+    const startAge = d.getStartAge();
+    const endAge = d.getEndAge();
+    const startYear = d.getStartYear();
+    const endYear = d.getEndYear();
+    // 童限／空干支：仍列出歲數年份，短批標明未交大運
+    if (!gz) {
+      const summary = `童限／起運前（約${startAge}–${endAge}歲，${startYear}–${endYear}年）：尚未交正式大運，多看年柱月柱同家庭環境；性格事業財感情健康以原局為主，流年仍可有小事起伏。`;
+      steps.push({
+        index: i,
+        ganZhi: "（起運前）",
+        startAge,
+        endAge,
+        startYear,
+        endYear,
+        stemShishen: "—",
+        brief: {
+          personality: "起運前多受家庭節奏帶動，自我主軸未完全展開。",
+          career: "學業／基礎為主，事業題尚早，宜打底。",
+          wealth: "財運看家長同環境，少作重大財務承諾。",
+          love: "感情線未成主旋律，宜觀察多過急定。",
+          health: "生長發育同作息為先；唔適睇醫生。",
+        },
+        summary,
+      });
+      continue;
+    }
+    const stem = gz[0];
+    const branch = gz[1] || "";
+    const rel = shishenOf(dayMaster, stem);
+    const brief = dayunBrief(rel, gz, branch, startYear, endYear, startAge, endAge);
+    const summary = `${startYear}–${endYear}年（約${startAge}–${endAge}歲）行${gz}大運（干對日主為「${rel}」）。性格：${brief.personality}事業：${brief.career}財：${brief.wealth}感情：${brief.love}健康：${brief.health}`;
+    steps.push({
+      index: i,
+      ganZhi: gz,
+      startAge,
+      endAge,
+      startYear,
+      endYear,
+      stemShishen: rel,
+      brief,
+      summary,
+    });
+  }
+  // Ensure we cover at least through ~90 if engine returns fewer — normally 10 steps
+  if (steps.length === 0) {
+    steps.push({
+      index: 0,
+      ganZhi: "—",
+      startAge: 1,
+      endAge: 10,
+      startYear: birthYear,
+      endYear: birthYear + 9,
+      stemShishen: "—",
+      brief: {
+        personality: "大運資料暫缺，請覆核出生時辰。",
+        career: "—",
+        wealth: "—",
+        love: "—",
+        health: "—",
+      },
+      summary: "大運序列未能排出，請檢查出生資料。",
+    });
+  }
+  return {
+    qiYunNote,
+    startAgeYears: sy,
+    startAgeMonths: sm,
+    startAgeDays: sd,
+    startSolarYmd,
+    steps,
+  };
+}
+
+function dayunBrief(
+  rel: string,
+  gz: string,
+  branch: string,
+  startYear: number,
+  endYear: number,
+  startAge: number,
+  endAge: number,
+): DayunStep["brief"] {
+  const span = `${startYear}–${endYear}（約${startAge}–${endAge}歲）`;
+  const map: Record<string, DayunStep["brief"]> = {
+    正官: {
+      personality: `${span}${gz}：責任感、規矩意識上枱，想企得穩、有個樣；忌自我捆綁。`,
+      career: "宜架構清晰崗位／升遷考核；交付同口碑換位，少靠含糊關係。",
+      wealth: "財隨職份同穩收，少投機；合約同信譽優先。",
+      love: "姻緣重名份同責任；相處講清楚期望，少冷戰。",
+      health: "壓力來自「應該」——肩頸睡眠要守；唔適求醫。",
+    },
+    七殺: {
+      personality: `${span}${gz}：競爭感、期限感近身，醒神亦易躁；把催促譯成清單。`,
+      career: "適合要拍板、有對抗性或急救型任務；忌無意義人際鬥爭。",
+      wealth: "進帳可能急亦可能耗——大額留冷靜期，防被人催簽。",
+      love: "主張強，伴侶要受得你節奏；辯論贏唔等於關係贏。",
+      health: "高壓十年，盯心血管同失眠訊號；運動洩壓。",
+    },
+    正印: {
+      personality: `${span}${gz}：求安穩、求「做得啱」；學習同被托住感變強。`,
+      career: "利進修、證照、導師線；穩守專業護城多過亂跳。",
+      wealth: "財運平穩偏保守；知識變現慢但耐用。",
+      love: "需要安全感同溫厚溝通；少情緒勒索。",
+      health: "睡眠、脾胃、免疫宜保養；印多亦防懶散。",
+    },
+    偏印: {
+      personality: `${span}${gz}：思緒密、靈感多亦易孤；宜專精一條線。`,
+      career: "適合研究、技術深耕、小眾專業；忌同時開太多坑。",
+      wealth: "偏門機會有，要篩；主業穩先再試。",
+      love: "內心戲多，宜講出口；防封閉圈把你拉遠。",
+      health: "思慮傷神——限螢幕、定時落地活動。",
+    },
+    正財: {
+      personality: `${span}${gz}：務實、想理順收成同生活品質。`,
+      career: "穩收、對賬、可量化業績；合作寫明分成。",
+      wealth: "正財運——記帳、備用金、少追風；大額留一夜。",
+      love: "錢同愛可一齊規劃；務實承諾大過空談浪漫。",
+      health: "應酬飲食同代謝；規律運動。",
+    },
+    偏財: {
+      personality: `${span}${gz}：機會眼光活，花費同進帳一齊晃。`,
+      career: "兼職、流動性項目、人脈變現；主業唔好丟。",
+      wealth: "橫財／機會可接但預算封頂；「穩賺」即停。",
+      love: "場合多、選擇多；承諾要做到先再許下一個。",
+      health: "作息易亂——煙酒應酬設上限。",
+    },
+    食神: {
+      personality: `${span}${gz}：表達欲、分享欲旺，有光亦易攰。`,
+      career: "作品、教學、服務輸出換位置；報價同檔期要封頂。",
+      wealth: "進帳同口碑綁埋；收費程序寫清。",
+      love: "熱鬧互動多；記得留空白日畀親密關係。",
+      health: "輸出過勞——喉、消化、睡眠優先。",
+    },
+    傷官: {
+      personality: `${span}${gz}：睇穿就想講、想改；鋒芒十年，成敗睇收口。`,
+      career: "創新、改系統、顧問、品質把關；忌得罪人唔收尾。",
+      wealth: "錢同面子易一齊晃；守信譽同合約大過單次風光。",
+      love: "嘴快傷人——語氣留溫；伴侣要受得你標準高。",
+      health: "情緒上臉快，肩頸頭痛常見；運動同傾訴出口。",
+    },
+    比肩: {
+      personality: `${span}${gz}：自主、同儕並肩亦並肩爭。`,
+      career: "合夥要分工分成寫明；適合自立門戶但忌搶功局。",
+      wealth: "資源易被分薄——借貸擔保三思。",
+      love: "平等感重要；少同伴侶爭「邊個啱」。",
+      health: "好勝易過勞；留恢復日。",
+    },
+    劫財: {
+      personality: `${span}${gz}：拉扯、競爭、義氣同計較並存。`,
+      career: "防搶功同灰色合作；白紙黑字至上。",
+      wealth: "破耗感——錢銀往來要收據；少聯署。",
+      love: "第三者或資源爭奪戲要醒；界線清晰。",
+      health: "血氣兩端、意外風險意識；保險同檢查。",
+    },
+  };
+  return map[rel] || {
+    personality: `${span}行${gz}（${branch}）：節奏中性，成敗多在自身規劃。`,
+    career: "穩守交付、累積可帶走技能。",
+    wealth: "以技能換財，少投機。",
+    love: "日常經營多過儀式；期望講出口。",
+    health: "作息運動底線；唔適求醫。",
   };
 }
 
@@ -329,6 +559,7 @@ export function baziTemplateReading(chart: BaziChart, liunianYear?: number): Tem
     title,
     text: natalText(key, chart, p),
   }));
+  sections.push(...dayunSections(chart));
   if (liunianYear) sections.push(...liunianSections(chart, p, liunianYear));
   sections.push(oralSynthesis(chart, p, liunianYear));
   return {
@@ -336,6 +567,65 @@ export function baziTemplateReading(chart: BaziChart, liunianYear?: number): Tem
     disclaimer: "唔係必然準確之斷語；僅供顧問核對排盤與敘事結構。禁止作為醫療、投資、法律依據。文化參考，唔作必準保證。",
     sections,
   };
+}
+
+/** 十年大運：總表＋每步短批（含年份，供大事核對對位） */
+function dayunSections(chart: BaziChart): DomainSection[] {
+  const du = chart.dayun;
+  const out: DomainSection[] = [];
+  const overviewLines = [
+    `起運：${du.qiYunNote}`,
+    "以下為十年大運序列（干支・約起止歲／年・性格／事業／財／感情／健康短批）。大事核對請對「事件年份」落喺邊一步大運。",
+  ];
+  for (const s of du.steps) {
+    if (!s.ganZhi || s.ganZhi === "（起運前）") {
+      overviewLines.push(`・起運前 ${s.startYear}–${s.endYear}（約${s.startAge}–${s.endAge}歲）`);
+    } else {
+      overviewLines.push(
+        `・${s.ganZhi}大運 ${s.startYear}–${s.endYear}（約${s.startAge}–${s.endAge}歲／十神${s.stemShishen}）`,
+      );
+    }
+  }
+  out.push({
+    key: "十年大運",
+    title: "十年大運・總覽",
+    text: overviewLines.join("\n"),
+  });
+  for (const s of du.steps) {
+    const label = !s.ganZhi || s.ganZhi === "（起運前）" ? "起運前" : `${s.ganZhi}大運`;
+    out.push({
+      key: `大運${s.index}`,
+      title: `大運・${label}（${s.startYear}–${s.endYear}）`,
+      text: s.summary,
+    });
+    // Domain-tagged slices so compare／大事核對 theme matcher can hit 事業／財／感情／健康
+    out.push({
+      key: `大運${s.index}性格`,
+      title: `大運性格・${label}（${s.startYear}–${s.endYear}）`,
+      text: `${s.startYear}–${s.endYear}年（約${s.startAge}–${s.endAge}歲）${label}：${s.brief.personality}`,
+    });
+    out.push({
+      key: `大運${s.index}事業`,
+      title: `大運事業・${label}（${s.startYear}–${s.endYear}）`,
+      text: `${s.startYear}–${s.endYear}年 ${label}事業：${s.brief.career}`,
+    });
+    out.push({
+      key: `大運${s.index}財運`,
+      title: `大運財運・${label}（${s.startYear}–${s.endYear}）`,
+      text: `${s.startYear}–${s.endYear}年 ${label}財：${s.brief.wealth}`,
+    });
+    out.push({
+      key: `大運${s.index}感情`,
+      title: `大運感情・${label}（${s.startYear}–${s.endYear}）`,
+      text: `${s.startYear}–${s.endYear}年 ${label}感情：${s.brief.love}`,
+    });
+    out.push({
+      key: `大運${s.index}健康`,
+      title: `大運健康・${label}（${s.startYear}–${s.endYear}）`,
+      text: `${s.startYear}–${s.endYear}年 ${label}健康：${s.brief.health}`,
+    });
+  }
+  return out;
 }
 
 function liunianYearVoice(rel: string, year: number, ygz: string, p: ChartProfile): string {
@@ -587,6 +877,17 @@ function oralSynthesis(chart: BaziChart, p: ChartProfile, liunianYear?: number):
     } else {
       paras.push(
         `講到${liunianYear}年（${ygz}），重點係${verb}——${mood}。貴人穩重守信，小人情緒化；遇事先觀察再交心。`,
+      );
+    }
+  }
+  if (chart.dayun?.steps?.length) {
+    const covering = chart.dayun.steps.filter((s) => {
+      const y = liunianYear || new Date().getFullYear();
+      return y >= s.startYear && y <= s.endYear;
+    })[0];
+    if (covering) {
+      paras.push(
+        `大運方面：${covering.ganZhi === "（起運前）" ? "仍近起運前／童限" : `而家／近段行${covering.ganZhi}大運（${covering.startYear}–${covering.endYear}，十神${covering.stemShishen}）`}。十年大運係大事核對嘅主軸之一——流年係一年戲，大運係十年舞台。詳見上面「十年大運」各步短批。`,
       );
     }
   }
